@@ -61,6 +61,8 @@ class EventController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // TODO: generate unique slug
+
             $eventRepository->save($event, true);
 
             $this->addFlash('notice', 'The event was created successfully.');
@@ -93,6 +95,8 @@ class EventController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // TODO: generate unique slug
+
             $eventRepository->save($event, true);
 
             $this->addFlash('notice', 'The event was updated successfully.');
