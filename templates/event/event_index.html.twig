@@ -47,18 +47,7 @@
             <td>{{ event }}</td>
             <td>
               {% for time in event.times %}
-              <small class="d-block">
-                {% if time.daysMatch %}
-                  {{ time.startsAt|date('D, M j Y') }},
-                  {{ time.startsAt|date('g:ia') }}
-                  -
-                  {{ time.endsAt|date('g:ia') }}
-                {% else %}
-                  {{ time.startsAt|date('D, M j Y g:ia') }}
-                  -
-                  {{ time.endsAt|date('D, M j Y g:ia') }}
-                {% endif %}
-              </small>
+              <small class="d-block">{{ time }}</small>
               {% endfor %}
             </td>
             <td>{{ event.updatedAt|datetime }}</td>

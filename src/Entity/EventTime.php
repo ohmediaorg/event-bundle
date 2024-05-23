@@ -23,6 +23,32 @@ class EventTime
     #[ORM\JoinColumn(nullable: false)]
     private ?Event $event = null;
 
+    public function __toString(): string
+    {
+        $timezone = new \DateTimeZone(date_default_timezone_get());
+
+        // NOTE: DateTimeImmutable::setTimeZone returns a new object
+
+        $startsAt = $this->starts_at->setTimezone($timezone);
+
+        $endsAt = $this->ends_at->setTimezone($timezone);
+
+        if ($startsAt->format('Ymd') === $endsAt->format('Ymd')) {
+            return sprintf(
+                '%s, %s - %s',
+                $startsAt->format('D, M j Y'),
+                $startsAt->format('g:ia'),
+                $endsAt->format('g:ia'),
+            );
+        }
+
+        return sprintf(
+            '%s - %s',
+            $startsAt->format('D, M j Y g:ia'),
+            $endsAt->format('D, M j Y g:ia'),
+        );
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -50,29 +76,6 @@ class EventTime
         $this->ends_at = $ends_at;
 
         return $this;
-    }
-
-    public function yearsMatch(): bool
-    {
-        return $this->starts_at->format('Y') === $this->ends_at->format('Y');
-    }
-
-    public function monthsMatch(): bool
-    {
-        if (!$this->yearsMatch()) {
-            return false;
-        }
-
-        return $this->starts_at->format('m') === $this->ends_at->format('m');
-    }
-
-    public function daysMatch(): bool
-    {
-        if (!$this->monthsMatch()) {
-            return false;
-        }
-
-        return $this->starts_at->format('d') === $this->ends_at->format('d');
     }
 
     public function getEvent(): ?Event
