@@ -3,6 +3,7 @@
 namespace OHMedia\EventBundle\Form;
 
 use OHMedia\EventBundle\Entity\Event;
+use OHMedia\FileBundle\Form\Type\FileEntityType;
 use OHMedia\WysiwygBundle\Form\Type\WysiwygType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -30,6 +31,7 @@ class EventType extends AbstractType
 
         $builder->add('ticket_url', UrlType::class, [
             'required' => false,
+            'label' => 'Tickets URL',
         ]);
 
         $builder->add('image', FileEntityType::class, [

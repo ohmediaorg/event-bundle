@@ -12,9 +12,13 @@ class EventTimeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('starts_at', DateTimeType::class);
+        $builder->add('starts_at', DateTimeType::class, [
+            'widget' => 'single_text',
+        ]);
 
-        $builder->add('ends_at', DateTimeType::class);
+        $builder->add('ends_at', DateTimeType::class, [
+            'widget' => 'single_text',
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

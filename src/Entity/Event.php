@@ -10,6 +10,7 @@ use OHMedia\EventBundle\Repository\EventRepository;
 use OHMedia\FileBundle\Entity\File;
 use OHMedia\SecurityBundle\Entity\Traits\BlameableTrait;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 #[UniqueEntity('slug')]
@@ -23,18 +24,34 @@ class Event
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Length(max: 255)]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Length(max: 255)]
     private ?string $slug = null;
 
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Length(max: 255)]
+    private ?string $snippet = null;
+
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private ?string $location = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private ?string $ticket_url = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
@@ -81,6 +98,18 @@ class Event
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getSnippet(): ?string
+    {
+        return $this->snippet;
+    }
+
+    public function setSnippet(string $snippet): static
+    {
+        $this->snippet = $snippet;
 
         return $this;
     }

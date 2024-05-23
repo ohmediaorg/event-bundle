@@ -1,0 +1,153 @@
+{% extends '@OHMediaBackend/base.html.twig' %}
+
+{% block meta_title %}{{ form_title }}{% endblock %}
+
+{% macro form_row_time(form) %}
+<tr id="{{ form.vars.id }}">
+  <td>
+    {{ form_widget(form.starts_at, {
+      attr: {
+        class: 'form-control-sm',
+      },
+    }) }}
+  </td>
+  <td>
+    {{ form_widget(form.ends_at, {
+      attr: {
+        class: 'form-control-sm',
+      },
+    }) }}
+  </td>
+  <td>
+    <a class="btn btn-danger btn-sm float-end" title="Delete" href="#" id="{{ form.vars.id }}_delete">
+      {{ bootstrap_icon('trash-fill') }}
+      <span class="visually-hidden">Delete</span>
+    </a>
+  </td>
+</tr>
+{% endmacro %}
+
+{% block main %}
+<div class="row">
+  <div class="col-xl-8">
+    <div class="card">
+      <div class="card-body">
+        <h1 class="card-title h3">{{ form_title }}</h1>
+
+        {{ form_start(form) }}
+          {{ form_row(form.name) }}
+          {{ form_row(form.snippet) }}
+          {{ form_row(form.description) }}
+          {{ form_row(form.location) }}
+          {{ form_row(form.ticket_url) }}
+          {{ form_row(form.image) }}
+
+          {% do form.times.setRendered %}
+
+          <fieldset class="mb-3">
+            {{ form_label(form.times) }}
+
+            <div id="{{ form.times.vars.id }}">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>&nbsp;</th>
+                  </tr>
+                </thead>
+                <tbody id="times_container">
+                {% for child in form.times.children %}
+                {{ _self.form_row_time(child) }}
+                {% endfor %}
+                </tbody>
+              </table>
+              <a class="btn btn-primary btn-sm" id="add_time" href="#">
+                {{ bootstrap_icon('plus') }}
+                Add Time
+              </a>
+            </div>
+          </fieldset>
+        {{ form_end(form) }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<template id="time_prototype">{{ _self.form_row_time(form.times.vars.prototype) }}</template>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const timePrototype = document.getElementById('time_prototype');
+  const timePrototypeName = {{ form.times.vars.prototype.vars.name|json_encode|raw }};
+
+  const addTimeButton = document.getElementById('add_time');
+  const timesContainer = document.getElementById('times_container');
+
+  let timeIndex = {{ form.times.children|length - 1 }};
+
+  async function initRow(row, newRow = false) {
+    const startsAt = document.getElementById(row.id + '_starts_at');
+    const endsAt = document.getElementById(row.id + '_ends_at');
+
+    function onStartsAtChange() {
+      endsAt.min = startsAt.value;
+    }
+
+    startsAt.addEventListener('change', onStartsAtChange);
+
+    onStartsAtChange();
+
+    const deleteButton = document.getElementById(row.id + '_delete');
+
+    deleteButton.addEventListener('click', async function(e) {
+      e.preventDefault();
+
+      const confirmed = await customConfirm('Are you sure you want to delete this entry?');
+
+      if (confirmed) {
+        row.remove();
+
+        const rows = timesContainer.querySelectorAll('tr');
+
+        if (0 === rows.length) {
+          addTime();
+        } else if (1 === rows.length) {
+          rows[0].querySelector('#' + rows[0].id + '_delete').style.display = 'none';
+        }
+      }
+    });
+  }
+
+  function addTime() {
+    timeIndex++;
+
+    const row = timePrototype.content.firstElementChild.cloneNode(true);
+
+    row.innerHTML = row.innerHTML.replaceAll(timePrototypeName, timeIndex);
+
+    row.id = row.id.replace(timePrototypeName, timeIndex);
+
+    timesContainer.append(row);
+
+    initRow(row, true);
+  }
+
+  addTimeButton.addEventListener('click', async function(e) {
+    e.preventDefault();
+
+    addTime();
+  });
+
+  const rows = timesContainer.querySelectorAll('tr');
+
+  rows.forEach(initRow);
+
+  if (!rows.length) {
+    addTime();
+  }
+});
+</script>
+{% endblock %}
