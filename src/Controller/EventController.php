@@ -11,9 +11,12 @@ use OHMedia\EventBundle\Security\Voter\EventVoter;
 use OHMedia\SecurityBundle\Form\DeleteType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 #[Admin]
 class EventController extends AbstractController
@@ -64,17 +67,18 @@ class EventController extends AbstractController
 
         $form->handleRequest($request);
 
-        // TODO: ensure times aren't overlapping
-        // and starts_at < ends_at
+        if ($form->isSubmitted()) {
+            $this->validateTimes($form);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // TODO: generate unique slug
+            $this->setSlug($eventRepository, $event);
 
-            $eventRepository->save($event, true);
+            if ($form->isValid()) {
+                $this->save($eventRepository, $event);
 
-            $this->addFlash('notice', 'The event was created successfully.');
+                $this->addFlash('notice', 'The event was created successfully.');
 
-            return $this->redirectToRoute('event_index');
+                return $this->redirectToRoute('event_index');
+            }
         }
 
         return $this->render('@OHMediaEvent/event/event_create.html.twig', [
@@ -101,20 +105,96 @@ class EventController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // TODO: generate unique slug
+        if ($form->isSubmitted()) {
+            $this->validateTimes($form);
 
-            $eventRepository->save($event, true);
+            $this->setSlug($eventRepository, $event);
 
-            $this->addFlash('notice', 'The event was updated successfully.');
+            if ($form->isValid()) {
+                $this->save($eventRepository, $event);
 
-            return $this->redirectToRoute('event_index');
+                $this->addFlash('notice', 'The event was updated successfully.');
+
+                return $this->redirectToRoute('event_index');
+            }
         }
 
         return $this->render('@OHMediaEvent/event/event_edit.html.twig', [
             'form' => $form->createView(),
             'event' => $event,
         ]);
+    }
+
+    private function validateTimes(FormInterface $form): void
+    {
+        $formTimes = $form->get('times')->all();
+
+        usort($formTimes, function ($a, $b) {
+            return $a->getData()->getStartsAt() <=> $b->getData()->getStartsAt();
+        });
+
+        $previousEndsAt = null;
+        $overlapMessage = 'The times should not overlap.';
+        $startBeforeEndMessage = 'A Start time should be before its corresponding End time.';
+
+        foreach ($formTimes as $formTime) {
+            $time = $formTime->getData();
+
+            if ($previousEndsAt && $time->getStartsAt() < $previousEndsAt) {
+                $this->addFlash('error', $overlapMessage);
+
+                $form->addError(new FormError($overlapMessage));
+
+                break;
+            }
+
+            if ($time->getStartsAt() > $time->getEndsAt()) {
+                $this->addFlash('error', $startBeforeEndMessage);
+
+                $form->addError(new FormError($startBeforeEndMessage));
+
+                break;
+            }
+
+            $previousEndsAt = $time->getEndsAt();
+        }
+    }
+
+    private function setSlug(EventRepository $eventRepository, Event $event): void
+    {
+        $slugger = new AsciiSlugger();
+
+        $slug = $event->getSlug();
+
+        if (!$slug) {
+            // create a unique slug
+            $name = strtolower($event->getName());
+
+            $slug = $slugger->slug($name);
+
+            $id = $event->getId();
+
+            $i = 1;
+            while ($eventRepository->countBySlug($slug, $id)) {
+                $slug = $slugger->slug($name.'-'.$i);
+
+                ++$i;
+            }
+        } else {
+            // make sure the slug is formatted properly
+            $slug = $slugger->slug(strtolower($slug));
+        }
+
+        $event->setSlug($slug);
+    }
+
+    private function save(EventRepository $eventRepository, Event $event): void
+    {
+        foreach ($event->getTimes() as $time) {
+            $time->setEvent($event);
+        }
+
+        $eventRepository->save($event, true);
     }
 
     #[Route('/event/{id}/delete', name: 'event_delete', methods: ['GET', 'POST'])]

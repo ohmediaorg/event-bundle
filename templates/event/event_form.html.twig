@@ -48,6 +48,16 @@
             {{ form_label(form.times) }}
 
             <div id="{{ form.times.vars.id }}">
+              <small class="d-block">
+                Entering time:
+
+                <ul>
+                  <li>there must be at least 1 entry</li>
+                  <li>entries may not overlap</li>
+                  <li>the Start time must be before the End time for a single entry</li>
+                </ul>
+              </small>
+
               <table class="table table-sm">
                 <thead>
                   <tr>

@@ -30,8 +30,6 @@ class Event
     private ?string $name = null;
 
     #[ORM\Column(length: 255, unique: true)]
-    #[Assert\NotBlank]
-    #[Assert\NotNull]
     #[Assert\Length(max: 255)]
     private ?string $slug = null;
 
@@ -60,7 +58,8 @@ class Event
     /**
      * @var Collection<int, EventTime>
      */
-    #[ORM\OneToMany(targetEntity: EventTime::class, mappedBy: 'event', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: EventTime::class, mappedBy: 'event', orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['starts_at' => 'ASC'])]
     private Collection $times;
 
     public function __construct()

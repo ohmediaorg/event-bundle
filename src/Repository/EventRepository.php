@@ -3,6 +3,8 @@
 namespace OHMedia\EventBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\Persistence\ManagerRegistry;
 use OHMedia\EventBundle\Entity\Event;
 
@@ -35,5 +37,26 @@ class EventRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function countBySlug(string $slug, int $id = null)
+    {
+        $params = [
+            new Parameter('slug', $slug),
+        ];
+
+        $qb = $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->where('e.slug = :slug');
+
+        if ($id) {
+            $qb->andWhere('e.id <> :id');
+
+            $params[] = new Parameter('id', $id);
+        }
+
+        return $qb->setParameters(new ArrayCollection($params))
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }
