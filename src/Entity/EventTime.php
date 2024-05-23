@@ -52,6 +52,29 @@ class EventTime
         return $this;
     }
 
+    public function yearsMatch(): bool
+    {
+        return $this->starts_at->format('Y') === $this->ends_at->format('Y');
+    }
+
+    public function monthsMatch(): bool
+    {
+        if (!$this->yearsMatch()) {
+            return false;
+        }
+
+        return $this->starts_at->format('m') === $this->ends_at->format('m');
+    }
+
+    public function daysMatch(): bool
+    {
+        if (!$this->monthsMatch()) {
+            return false;
+        }
+
+        return $this->starts_at->format('d') === $this->ends_at->format('d');
+    }
+
     public function getEvent(): ?Event
     {
         return $this->event;
