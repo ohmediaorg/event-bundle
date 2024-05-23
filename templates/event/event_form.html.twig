@@ -105,14 +105,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  async function initRow(row, newRow = false) {
+  async function initRow(row) {
     const startsAt = document.getElementById(row.id + '_starts_at');
     const endsAt = document.getElementById(row.id + '_ends_at');
 
     function onStartsAtChange() {
       endsAt.min = startsAt.value;
-
-      // TODO: if there's no endsAt.value, set it to an hour after startsAt.value
     }
 
     startsAt.addEventListener('change', onStartsAtChange);
@@ -132,11 +130,6 @@ document.addEventListener('DOMContentLoaded', function() {
         onAddOrRemoveTime();
       }
     });
-
-    if (newRow) {
-      // TODO: set this row's start/end values to a the previous rows values
-      // plus a day
-    }
   }
 
   function addTime() {
@@ -150,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     timesContainer.append(row);
 
-    initRow(row, true);
+    initRow(row);
 
     onAddOrRemoveTime();
   }
