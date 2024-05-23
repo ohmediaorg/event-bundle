@@ -1,0 +1,80 @@
+{% extends '@OHMediaBackend/base.html.twig' %}
+
+{% block meta_title %}Events{% endblock %}
+
+{% block breadcrumbs %}
+{{ bootstrap_breadcrumbs(
+  bootstrap_breadcrumb(bootstrap_icon('calendar-event-fill') ~ ' Events', 'event_index'),
+) }}
+{% endblock %}
+
+{% set can_create_event = is_granted(attributes.create, new_event) %}
+
+{% set create_event_href = path('event_create') %}
+
+{% block actions %}
+{% if can_create_event %}
+<a href="{{ create_event_href }}" class="btn btn-sm btn-primary">
+  {{ bootstrap_icon('plus') }} Add Event</a>
+{% endif %}
+{% endblock %}
+
+{% block main %}
+{% set event_count = pagination.count %}
+
+<div class="card">
+  <div class="card-body">
+    <div class="card-title card-title-with-count">
+      <h1 class="card-title-heading">Events</h1>
+      <div class="card-title-count">
+        {{ bootstrap_badge_primary(event_count) }}
+      </div>
+    </div>
+
+    {% if event_count %}
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Last Updated</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for event in pagination.results %}
+          <tr>
+            <td>{{ event }}</td>
+            <td>{{ event.updatedAt|datetime }}</td>
+            <td>
+              {% if is_granted(attributes.edit, event) %}
+              <a class="btn btn-sm btn-primary btn-action" href="{{ path('event_edit', {id: event.id}) }}" title="Edit">
+                {{ bootstrap_icon('pen-fill') }}
+                <span class="visually-hidden">Edit</span>
+              </a>
+              {% endif %}
+              {% if is_granted(attributes.delete, event) %}
+              <a class="btn btn-sm btn-danger btn-action" href="{{ path('event_delete', {id: event.id}) }}" title="Delete" data-confirm="Are you sure you want to delete this event? Clicking OK will take you to a verification step to delete this entry.">
+                {{ bootstrap_icon('trash-fill') }}
+                <span class="visually-hidden">Delete</span>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {{ bootstrap_pagination(pagination) }}
+
+      <small>{{ bootstrap_pagination_info(pagination) }}</small>
+    {% else %}
+      <p>
+        No events found.
+        {% if can_create_event %}
+        <a href="{{ create_event_href }}">Click here to add an event.</a>
+        {% endif %}
+      </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

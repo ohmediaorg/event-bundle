@@ -1,0 +1,10 @@
+{% extends '@OHMediaBackend/form.html.twig' %}
+
+{% set form_title = 'Edit Event' %}
+
+{% block breadcrumbs %}
+{{ bootstrap_breadcrumbs(
+  bootstrap_breadcrumb(bootstrap_icon('calendar-event-fill') ~ ' Events', 'event_index'),
+  bootstrap_breadcrumb('Edit'),
+) }}
+{% endblock %}
