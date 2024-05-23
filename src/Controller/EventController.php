@@ -64,6 +64,9 @@ class EventController extends AbstractController
 
         $form->handleRequest($request);
 
+        // TODO: ensure times aren't overlapping
+        // and starts_at < ends_at
+
         if ($form->isSubmitted() && $form->isValid()) {
             // TODO: generate unique slug
 

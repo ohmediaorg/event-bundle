@@ -111,6 +111,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function onStartsAtChange() {
       endsAt.min = startsAt.value;
+
+      // TODO: if there's no endsAt.value, set it to an hour after startsAt.value
     }
 
     startsAt.addEventListener('change', onStartsAtChange);
@@ -130,6 +132,11 @@ document.addEventListener('DOMContentLoaded', function() {
         onAddOrRemoveTime();
       }
     });
+
+    if (newRow) {
+      // TODO: set this row's start/end values to a the previous rows values
+      // plus a day
+    }
   }
 
   function addTime() {
