@@ -88,6 +88,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
   let timeIndex = {{ form.times.children|length - 1 }};
 
+  function onAddOrRemoveTime() {
+    const rows = timesContainer.querySelectorAll('tr');
+
+    if (0 === rows.length) {
+      // make sure there is always one entry
+      addTime();
+    } else if (1 === rows.length) {
+      // if there is only one entry, hide its delete button
+      rows[0].querySelector('#' + rows[0].id + '_delete').style.visibility = 'hidden';
+    } else {
+      // make sure all delete buttons are visible
+      rows.forEach(row => {
+        row.querySelector('#' + row.id + '_delete').style.visibility = '';
+      });
+    }
+  }
+
   async function initRow(row, newRow = false) {
     const startsAt = document.getElementById(row.id + '_starts_at');
     const endsAt = document.getElementById(row.id + '_ends_at');
@@ -110,13 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (confirmed) {
         row.remove();
 
-        const rows = timesContainer.querySelectorAll('tr');
-
-        if (0 === rows.length) {
-          addTime();
-        } else if (1 === rows.length) {
-          rows[0].querySelector('#' + rows[0].id + '_delete').style.display = 'none';
-        }
+        onAddOrRemoveTime();
       }
     });
   }
@@ -133,6 +144,8 @@ document.addEventListener('DOMContentLoaded', function() {
     timesContainer.append(row);
 
     initRow(row, true);
+
+    onAddOrRemoveTime();
   }
 
   addTimeButton.addEventListener('click', async function(e) {
