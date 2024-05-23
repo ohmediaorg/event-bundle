@@ -9,8 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
 use OHMedia\EventBundle\Repository\EventRepository;
 use OHMedia\FileBundle\Entity\File;
 use OHMedia\SecurityBundle\Entity\Traits\BlameableTrait;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
+#[UniqueEntity('slug')]
 class Event
 {
     use BlameableTrait;
@@ -23,7 +25,7 @@ class Event
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $slug = null;
 
     #[ORM\Column(type: Types::TEXT)]
