@@ -31,6 +31,10 @@ class EventController extends AbstractController
             'You cannot access the list of events.'
         );
 
+        // TODO: listings for upcoming vs past events
+        // order upcoming by starts_at ASC
+        // order past by starts_at DESC
+
         $qb = $eventRepository->createQueryBuilder('e');
         $qb->orderBy('e.id', 'desc');
 
