@@ -1,0 +1,27 @@
+{
+    "name": "ohmediaorg/event-bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony EventBundle",
+    "keywords": ["Event"],
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Justin Hoffman",
+            "email": "justin@ohmedia.ca"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/framework-bundle": "6.4.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "OHMedia\\EventBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OHMedia\\EventBundle\\Tests\\": "tests/"
+        }
+    }
+}
