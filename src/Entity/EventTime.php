@@ -2,8 +2,8 @@
 
 namespace OHMedia\EventBundle\Entity;
 
-use App\Repository\EventTimeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use OHMedia\EventBundle\Repository\EventTimeRepository;
 
 #[ORM\Entity(repositoryClass: EventTimeRepository::class)]
 class EventTime
