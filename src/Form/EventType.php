@@ -4,18 +4,24 @@ namespace OHMedia\EventBundle\Form;
 
 use OHMedia\EventBundle\Entity\Event;
 use OHMedia\FileBundle\Form\Type\FileEntityType;
+use OHMedia\TimezoneBundle\Service\Timezone;
 use OHMedia\WysiwygBundle\Form\Type\WysiwygType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EventType extends AbstractType
 {
+    public function __construct(private Timezone $timezone)
+    {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $event = $options['data'];
@@ -41,6 +47,13 @@ class EventType extends AbstractType
             'image' => true,
             'data' => $event->getImage(),
             'required' => false,
+        ]);
+
+        $builder->add('timezone', TimezoneType::class, [
+            'attr' => [
+                'class' => 'nice-select2',
+            ],
+            'data' => $event->getTimezone() ?? $this->timezone->get(),
         ]);
 
         $builder->add('times', CollectionType::class, [

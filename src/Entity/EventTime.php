@@ -25,13 +25,9 @@ class EventTime
 
     public function __toString(): string
     {
-        $timezone = new \DateTimeZone(date_default_timezone_get());
+        $startsAt = $this->getStartsAtWithTimezone();
 
-        // NOTE: DateTimeImmutable::setTimeZone returns a new object
-
-        $startsAt = $this->starts_at->setTimezone($timezone);
-
-        $endsAt = $this->ends_at->setTimezone($timezone);
+        $endsAt = $this->getEndsAtWithTimezone();
 
         if ($startsAt->format('Ymd') === $endsAt->format('Ymd')) {
             return sprintf(
@@ -66,6 +62,13 @@ class EventTime
         return $this;
     }
 
+    public function getStartsAtWithTimezone(): ?\DateTimeImmutable
+    {
+        $timezone = new \DateTimeZone($this->event->getTimezone());
+
+        return $this->starts_at->setTimezone($timezone);
+    }
+
     public function getEndsAt(): ?\DateTimeImmutable
     {
         return $this->ends_at;
@@ -76,6 +79,13 @@ class EventTime
         $this->ends_at = $ends_at;
 
         return $this;
+    }
+
+    public function getEndsAtWithTimezone(): ?\DateTimeImmutable
+    {
+        $timezone = new \DateTimeZone($this->event->getTimezone());
+
+        return $this->ends_at->setTimezone($timezone);
     }
 
     public function getEvent(): ?Event

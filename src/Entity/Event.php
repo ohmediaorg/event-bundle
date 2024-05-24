@@ -55,6 +55,12 @@ class Event
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?File $image = null;
 
+    #[ORM\Column(length: 64)]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Timezone]
+    private ?string $timezone = null;
+
     /**
      * @var Collection<int, EventTime>
      */
@@ -157,6 +163,18 @@ class Event
     public function setImage(?File $image): static
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    public function getTimezone(): ?string
+    {
+        return $this->timezone;
+    }
+
+    public function setTimezone(?string $timezone): static
+    {
+        $this->timezone = $timezone;
 
         return $this;
     }
