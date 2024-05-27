@@ -88,7 +88,7 @@ class EventController extends AbstractController
             $this->setSlug($eventRepository, $event);
 
             if ($form->isValid()) {
-                $this->save($eventRepository, $event);
+                $this->save($eventRepository, $event, $form, $request);
 
                 $this->addFlash('notice', 'The event was created successfully.');
 
@@ -126,7 +126,7 @@ class EventController extends AbstractController
             $this->setSlug($eventRepository, $event);
 
             if ($form->isValid()) {
-                $this->save($eventRepository, $event);
+                $this->save($eventRepository, $event, $form, $request);
 
                 $this->addFlash('notice', 'The event was updated successfully.');
 
@@ -203,9 +203,27 @@ class EventController extends AbstractController
         $event->setSlug($slug);
     }
 
-    private function save(EventRepository $eventRepository, Event $event): void
-    {
-        foreach ($event->getTimes() as $time) {
+    private function save(
+        EventRepository $eventRepository,
+        Event $event,
+        FormInterface $form,
+        Request $request
+    ): void {
+        $times = $form->get('times')->getData();
+        $requestData = $request->request->all($form->getName());
+        $timesData = $requestData['times'];
+
+        $timezone = new \DateTimeZone($event->getTimezone());
+
+        foreach ($times as $i => $time) {
+            $startsAtData = $timesData[$i]['starts_at'];
+            $endsAtData = $timesData[$i]['ends_at'];
+
+            $startsAt = new \DateTimeImmutable($startsAtData, $timezone);
+            $endsAt = new \DateTimeImmutable($endsAtData, $timezone);
+
+            $time->setStartsAt($startsAt)->setEndsAt($endsAt);
+
             $time->setEvent($event);
         }
 
