@@ -14,7 +14,7 @@
 {% set amount %}
 {{ form_widget(form.amount, {
   attr: {
-    class: 'd-inline-block',
+    class: 'd-inline-block form-control-sm',
     style: 'width: 3.5rem',
   },
 }) }}
@@ -23,7 +23,7 @@
 {% set unit %}
 {{ form_widget(form.unit, {
   attr: {
-    class: 'd-inline-block',
+    class: 'd-inline-block form-select-sm',
     style: 'width: auto',
   },
 }) }}
