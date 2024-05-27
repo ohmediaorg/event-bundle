@@ -11,6 +11,7 @@ class EventVoter extends AbstractEntityVoter
     public const INDEX = 'index';
     public const CREATE = 'create';
     public const EDIT = 'edit';
+    public const DUPLICATE = 'duplicate';
     public const DELETE = 'delete';
 
     protected function getAttributes(): array
@@ -19,6 +20,7 @@ class EventVoter extends AbstractEntityVoter
             self::INDEX,
             self::CREATE,
             self::EDIT,
+            self::DUPLICATE,
             self::DELETE,
         ];
     }
@@ -39,6 +41,12 @@ class EventVoter extends AbstractEntityVoter
     }
 
     protected function canEdit(Event $event, User $loggedIn): bool
+    {
+        // TODO: don't allow past events to be edited?
+        return true;
+    }
+
+    protected function canDuplicate(Event $event, User $loggedIn): bool
     {
         return true;
     }

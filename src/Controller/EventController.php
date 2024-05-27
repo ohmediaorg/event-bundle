@@ -11,6 +11,8 @@ use OHMedia\EventBundle\Repository\EventRepository;
 use OHMedia\EventBundle\Security\Voter\EventVoter;
 use OHMedia\SecurityBundle\Form\DeleteType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -18,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[Admin]
 class EventController extends AbstractController
@@ -140,6 +143,79 @@ class EventController extends AbstractController
         ]);
     }
 
+    #[Route('/event/{id}/duplicate', name: 'event_duplicate', methods: ['GET', 'POST'])]
+    public function duplicate(
+        Request $request,
+        Event $existingEvent,
+        EventRepository $eventRepository
+    ): Response {
+        $this->denyAccessUnlessGranted(
+            EventVoter::DUPLICATE,
+            $existingEvent,
+            'You cannot duplicate this event.'
+        );
+
+        $newEvent = clone $existingEvent;
+
+        $formBuilder = $this->createFormBuilder();
+
+        $formBuilder->add('amount', IntegerType::class, [
+            'attr' => [
+                'min' => 1,
+            ],
+            'constraints' => [
+                new Assert\GreaterThanOrEqual(1),
+            ],
+            'data' => 1,
+        ]);
+
+        $formBuilder->add('unit', ChoiceType::class, [
+            'choices' => [
+                'days' => 'day',
+                'weeks' => 'week',
+                'months' => 'month',
+                'years' => 'year',
+            ],
+        ]);
+
+        $formBuilder->add('submit', SubmitType::class);
+
+        $form = $formBuilder->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $this->setSlug($eventRepository, $newEvent);
+
+            if ($form->isValid()) {
+                $amount = $form->get('amount')->getData();
+                $unit = $form->get('unit')->getData();
+
+                $interval = \DateInterval::createFromDateString("$amount $unit");
+
+                foreach ($existingEvent->getTimes() as $time) {
+                    $time->setStartsAt($time->getStartsAt()->add($interval));
+                    $time->setEndsAt($time->getEndsAt()->add($interval));
+                    $newEvent->addTime($time);
+                }
+
+                $eventRepository->save($newEvent, true);
+
+                $this->addFlash('notice', 'The event was duplicated successfully.');
+
+                return $this->redirectToRoute('event_edit', [
+                    'id' => $newEvent->getId(),
+                ]);
+            }
+        }
+
+        return $this->render('@OHMediaEvent/event/event_duplicate.html.twig', [
+            'form' => $form->createView(),
+            'existing_event' => $existingEvent,
+            'new_event' => $newEvent,
+        ]);
+    }
+
     private function validateTimes(FormInterface $form): void
     {
         $formTimes = $form->get('times')->all();
@@ -203,8 +279,7 @@ class EventController extends AbstractController
         $event->setSlug($slug);
     }
 
-    private function save(
-        EventRepository $eventRepository,
+    private function setTimezone(
         Event $event,
         FormInterface $form,
         Request $request
@@ -223,7 +298,18 @@ class EventController extends AbstractController
             $endsAt = new \DateTimeImmutable($endsAtData, $timezone);
 
             $time->setStartsAt($startsAt)->setEndsAt($endsAt);
+        }
+    }
 
+    private function save(
+        EventRepository $eventRepository,
+        Event $event,
+        FormInterface $form,
+        Request $request
+    ): void {
+        $this->setTimezone($event, $form, $request);
+
+        foreach ($event->getTimes() as $time) {
             $time->setEvent($event);
         }
 
@@ -268,6 +354,7 @@ class EventController extends AbstractController
             'create' => EventVoter::CREATE,
             'delete' => EventVoter::DELETE,
             'edit' => EventVoter::EDIT,
+            'duplicate' => EventVoter::DUPLICATE,
         ];
     }
 }

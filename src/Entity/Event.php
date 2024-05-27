@@ -76,6 +76,18 @@ class Event
         $this->times = new ArrayCollection();
     }
 
+    public function __clone()
+    {
+        $this->id = null;
+        $this->slug = null;
+        $this->published_at = null;
+        $this->times = new ArrayCollection();
+
+        if ($this->image) {
+            $this->image = clone $this->image;
+        }
+    }
+
     public function __toString(): string
     {
         return (string) $this->name;
