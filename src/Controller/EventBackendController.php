@@ -2,7 +2,6 @@
 
 namespace OHMedia\EventBundle\Controller;
 
-use Doctrine\ORM\EntityManagerInterface;
 use OHMedia\BackendBundle\Routing\Attribute\Admin;
 use OHMedia\BootstrapBundle\Service\Paginator;
 use OHMedia\EventBundle\Entity\Event;
@@ -23,11 +22,10 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[Admin]
-class EventController extends AbstractController
+class EventBackendController extends AbstractController
 {
     #[Route('/events/{status}', name: 'event_index', methods: ['GET'], requirements: ['status' => 'upcoming|past'])]
     public function index(
-        EntityManagerInterface $em,
         EventRepository $eventRepository,
         Paginator $paginator,
         string $status = 'upcoming',
