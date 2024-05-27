@@ -60,7 +60,19 @@
         <tbody>
           {% for event in pagination.results %}
           <tr>
-            <td>{{ event }}</td>
+            <td>
+              {{ event }}
+              {% if not is_past %}
+                <br>
+                {% if event.isPublished %}
+                  {{ bootstrap_badge_success('Published') }}
+                {% elseif event.publishedAt %}
+                  {{ bootstrap_badge_warning('Pending') }}
+                {% else %}
+                  {{ bootstrap_badge_secondary('Draft') }}
+                {% endif %}
+              {% endif %}
+            </td>
             <td>
               {% for time in event.times %}
               <small class="d-block">{{ time }}</small>
