@@ -1,10 +1,10 @@
 {% extends '@OHMediaBackend/base.html.twig' %}
 
-{% block meta_title %}Events{% endblock %}
+{% block meta_title %}{{ title }}{% endblock %}
 
 {% block breadcrumbs %}
 {{ bootstrap_breadcrumbs(
-  bootstrap_breadcrumb(bootstrap_icon('calendar-event-fill') ~ ' Events', 'event_index'),
+  bootstrap_breadcrumb(bootstrap_icon('calendar-event-fill') ~ ' ' ~ title, 'event_index'),
 ) }}
 {% endblock %}
 
@@ -13,10 +13,26 @@
 {% set create_event_href = path('event_create') %}
 
 {% block actions %}
-{% if can_create_event %}
-<a href="{{ create_event_href }}" class="btn btn-sm btn-primary">
-  {{ bootstrap_icon('plus') }} Add Event</a>
-{% endif %}
+<div class="btn-group btn-group-sm">
+  {% if can_create_event %}
+    <a href="{{ create_event_href }}" class="btn btn-primary">
+      {{ bootstrap_icon('plus') }} Add Event
+    </a>
+  {% endif %}
+  {% if is_past %}
+    <a href="{{ path('event_index', {status: 'upcoming'}) }}" class="btn btn-primary">
+      {{ bootstrap_icon('hourglass-top') }}
+      Upcoming Events
+      {{ bootstrap_badge_dark(other_count) }}
+    </a>
+  {% else %}
+    <a href="{{ path('event_index', {status: 'past'}) }}" class="btn btn-primary">
+      {{ bootstrap_icon('hourglass-bottom') }}
+      Past Events
+      {{ bootstrap_badge_dark(other_count) }}
+    </a>
+  {% endif %}
+</div>
 {% endblock %}
 
 {% block main %}
@@ -25,7 +41,7 @@
 <div class="card">
   <div class="card-body">
     <div class="card-title card-title-with-count">
-      <h1 class="card-title-heading">Events</h1>
+      <h1 class="card-title-heading">{{ title }}</h1>
       <div class="card-title-count">
         {{ bootstrap_badge_primary(event_count) }}
       </div>
@@ -76,7 +92,7 @@
     {% else %}
       <p>
         No events found.
-        {% if can_create_event %}
+        {% if not is_past and can_create_event %}
         <a href="{{ create_event_href }}">Click here to add an event.</a>
         {% endif %}
       </p>

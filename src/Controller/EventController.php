@@ -2,6 +2,7 @@
 
 namespace OHMedia\EventBundle\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use OHMedia\BackendBundle\Routing\Attribute\Admin;
 use OHMedia\BootstrapBundle\Service\Paginator;
 use OHMedia\EventBundle\Entity\Event;
@@ -21,10 +22,12 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 #[Admin]
 class EventController extends AbstractController
 {
-    #[Route('/events', name: 'event_index', methods: ['GET'])]
+    #[Route('/events/{status}', name: 'event_index', methods: ['GET'], requirements: ['status' => 'upcoming|past'])]
     public function index(
+        EntityManagerInterface $em,
         EventRepository $eventRepository,
-        Paginator $paginator
+        Paginator $paginator,
+        string $status = 'upcoming',
     ): Response {
         $newEvent = new Event();
 
@@ -34,17 +37,29 @@ class EventController extends AbstractController
             'You cannot access the list of events.'
         );
 
-        // TODO: listings for upcoming vs past events
-        // order upcoming by starts_at ASC
-        // order past by starts_at DESC
+        $isPast = 'past' === $status;
 
-        $qb = $eventRepository->createQueryBuilder('e');
-        $qb->orderBy('e.id', 'desc');
+        if ($isPast) {
+            $currentQb = $eventRepository->getPastQueryBuilderOrdered();
+            $otherQb = $eventRepository->getUpcomingQueryBuilder();
+            $title = 'Past Events';
+        } else {
+            $currentQb = $eventRepository->getUpcomingQueryBuilderOrdered();
+            $otherQb = $eventRepository->getPastQueryBuilder();
+            $title = 'Upcoming Events';
+        }
+
+        $otherCount = $otherQb->select('COUNT(e)')
+            ->getQuery()
+            ->getSingleScalarResult();
 
         return $this->render('@OHMediaEvent/event/event_index.html.twig', [
-            'pagination' => $paginator->paginate($qb, 20),
+            'pagination' => $paginator->paginate($currentQb, 20),
             'new_event' => $newEvent,
             'attributes' => $this->getAttributes(),
+            'other_count' => $otherCount,
+            'is_past' => $isPast,
+            'title' => $title,
         ]);
     }
 
