@@ -12,19 +12,24 @@ class EventTimeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('starts_at', DateTimeType::class, [
+        $dateTimeOptions = [
             'widget' => 'single_text',
-        ]);
+        ];
 
-        $builder->add('ends_at', DateTimeType::class, [
-            'widget' => 'single_text',
-        ]);
+        if ($options['timezone']) {
+            $dateTimeOptions['view_timezone'] = $options['timezone'];
+        }
+
+        $builder->add('starts_at', DateTimeType::class, $dateTimeOptions);
+
+        $builder->add('ends_at', DateTimeType::class, $dateTimeOptions);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => EventTime::class,
+            'timezone' => null,
         ]);
     }
 }

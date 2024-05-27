@@ -60,6 +60,9 @@ class EventType extends AbstractType
             'entry_type' => EventTimeType::class,
             'allow_add' => true,
             'allow_delete' => true,
+            'entry_options' => [
+                'timezone' => $event->getTimezone(),
+            ],
         ]);
     }
 
