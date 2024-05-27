@@ -14,7 +14,7 @@ class EventNavItemProvider extends AbstractNavItemProvider
     {
         if ($this->isGranted(EventVoter::INDEX, new Event())) {
             return (new NavLink('Events', 'event_index'))
-                ->setIcon('calendar-event-fill');
+                ->setIcon('calendar3');
         }
 
         return null;
