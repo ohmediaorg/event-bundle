@@ -235,4 +235,17 @@ class Event
 
         return $this;
     }
+
+    public function isPublished(): bool
+    {
+        if (!$this->published_at) {
+            return false;
+        }
+
+        $utc = new \DateTimeZone('UTC');
+
+        $now = new \DateTime('now', $utc);
+
+        return $this->published_at->setTimezone($utc) < $now;
+    }
 }
