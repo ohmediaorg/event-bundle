@@ -68,6 +68,9 @@ class Event
     #[ORM\OrderBy(['starts_at' => 'ASC'])]
     private Collection $times;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $published_at = null;
+
     public function __construct()
     {
         $this->times = new ArrayCollection();
@@ -205,6 +208,18 @@ class Event
                 $time->setEvent(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPublishedAt(): ?\DateTimeImmutable
+    {
+        return $this->published_at;
+    }
+
+    public function setPublishedAt(?\DateTimeImmutable $published_at): static
+    {
+        $this->published_at = $published_at;
 
         return $this;
     }

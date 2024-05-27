@@ -4,6 +4,7 @@ namespace OHMedia\EventBundle\Form;
 
 use OHMedia\EventBundle\Entity\Event;
 use OHMedia\FileBundle\Form\Type\FileEntityType;
+use OHMedia\TimezoneBundle\Form\Type\DateTimeType;
 use OHMedia\TimezoneBundle\Service\Timezone;
 use OHMedia\WysiwygBundle\Form\Type\WysiwygType;
 use Symfony\Component\Form\AbstractType;
@@ -63,6 +64,12 @@ class EventType extends AbstractType
             'entry_options' => [
                 'timezone' => $event->getTimezone(),
             ],
+        ]);
+
+        $builder->add('published_at', DateTimeType::class, [
+            'label' => 'Published Date/Time',
+            'required' => false,
+            'widget' => 'single_text',
         ]);
     }
 
