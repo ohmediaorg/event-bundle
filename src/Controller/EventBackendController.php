@@ -5,6 +5,7 @@ namespace OHMedia\EventBundle\Controller;
 use OHMedia\BackendBundle\Routing\Attribute\Admin;
 use OHMedia\BootstrapBundle\Service\Paginator;
 use OHMedia\EventBundle\Entity\Event;
+use OHMedia\EventBundle\Entity\EventTime;
 use OHMedia\EventBundle\Form\EventType;
 use OHMedia\EventBundle\Repository\EventRepository;
 use OHMedia\EventBundle\Security\Voter\EventVoter;
@@ -191,10 +192,12 @@ class EventBackendController extends AbstractController
 
                 $interval = \DateInterval::createFromDateString("$amount $unit");
 
-                foreach ($existingEvent->getTimes() as $time) {
-                    $time->setStartsAt($time->getStartsAt()->add($interval));
-                    $time->setEndsAt($time->getEndsAt()->add($interval));
-                    $newEvent->addTime($time);
+                foreach ($existingEvent->getTimes() as $existingTime) {
+                    $newTime = new EventTime();
+
+                    $newTime->setStartsAt($existingTime->getStartsAt()->add($interval));
+                    $newTime->setEndsAt($existingTime->getEndsAt()->add($interval));
+                    $newEvent->addTime($newTime);
                 }
 
                 $eventRepository->save($newEvent, true);
