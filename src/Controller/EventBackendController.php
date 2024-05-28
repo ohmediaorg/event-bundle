@@ -25,9 +25,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[Admin]
 class EventBackendController extends AbstractController
 {
+    public function __construct(private EventRepository $this->eventRepository)
+    {
+
+    }
+
     #[Route('/events/{status}', name: 'event_index', methods: ['GET'], requirements: ['status' => 'upcoming|past'])]
     public function index(
-        EventRepository $eventRepository,
         Paginator $paginator,
         string $status = 'upcoming',
     ): Response {
@@ -42,12 +46,12 @@ class EventBackendController extends AbstractController
         $isPast = 'past' === $status;
 
         if ($isPast) {
-            $currentQb = $eventRepository->getPastQueryBuilderOrdered();
-            $otherQb = $eventRepository->getUpcomingQueryBuilder();
+            $currentQb = $this->eventRepository->getPastQueryBuilderOrdered();
+            $otherQb = $this->eventRepository->getUpcomingQueryBuilder();
             $title = 'Past Events';
         } else {
-            $currentQb = $eventRepository->getUpcomingQueryBuilderOrdered();
-            $otherQb = $eventRepository->getPastQueryBuilder();
+            $currentQb = $this->eventRepository->getUpcomingQueryBuilderOrdered();
+            $otherQb = $this->eventRepository->getPastQueryBuilder();
             $title = 'Upcoming Events';
         }
 
@@ -66,10 +70,8 @@ class EventBackendController extends AbstractController
     }
 
     #[Route('/event/create', name: 'event_create', methods: ['GET', 'POST'])]
-    public function create(
-        Request $request,
-        EventRepository $eventRepository
-    ): Response {
+    public function create(Request $request): Response
+    {
         $event = new Event();
 
         $this->denyAccessUnlessGranted(
@@ -87,10 +89,10 @@ class EventBackendController extends AbstractController
         if ($form->isSubmitted()) {
             $this->validateTimes($form);
 
-            $this->setSlug($eventRepository, $event);
+            $this->setSlug($this->eventRepository, $event);
 
             if ($form->isValid()) {
-                $this->save($eventRepository, $event, $form, $request);
+                $this->save($this->eventRepository, $event, $form, $request);
 
                 $this->addFlash('notice', 'The event was created successfully.');
 
@@ -108,7 +110,6 @@ class EventBackendController extends AbstractController
     public function edit(
         Request $request,
         Event $event,
-        EventRepository $eventRepository
     ): Response {
         $this->denyAccessUnlessGranted(
             EventVoter::EDIT,
@@ -125,10 +126,10 @@ class EventBackendController extends AbstractController
         if ($form->isSubmitted()) {
             $this->validateTimes($form);
 
-            $this->setSlug($eventRepository, $event);
+            $this->setSlug($this->eventRepository, $event);
 
             if ($form->isValid()) {
-                $this->save($eventRepository, $event, $form, $request);
+                $this->save($this->eventRepository, $event, $form, $request);
 
                 $this->addFlash('notice', 'The event was updated successfully.');
 
@@ -146,7 +147,6 @@ class EventBackendController extends AbstractController
     public function duplicate(
         Request $request,
         Event $existingEvent,
-        EventRepository $eventRepository
     ): Response {
         $this->denyAccessUnlessGranted(
             EventVoter::DUPLICATE,
@@ -184,7 +184,7 @@ class EventBackendController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-            $this->setSlug($eventRepository, $newEvent);
+            $this->setSlug($this->eventRepository, $newEvent);
 
             if ($form->isValid()) {
                 $amount = $form->get('amount')->getData();
@@ -200,7 +200,7 @@ class EventBackendController extends AbstractController
                     $newEvent->addTime($newTime);
                 }
 
-                $eventRepository->save($newEvent, true);
+                $this->eventRepository->save($newEvent, true);
 
                 $this->addFlash('notice', 'The event was duplicated successfully.');
 
@@ -252,29 +252,22 @@ class EventBackendController extends AbstractController
         }
     }
 
-    private function setSlug(EventRepository $eventRepository, Event $event): void
+    private function setSlug(Event $event): void
     {
         $slugger = new AsciiSlugger();
 
-        $slug = $event->getSlug();
+        // create a unique slug
+        $name = strtolower($event->getName());
 
-        if (!$slug) {
-            // create a unique slug
-            $name = strtolower($event->getName());
+        $slug = $slugger->slug($name);
 
-            $slug = $slugger->slug($name);
+        $id = $event->getId();
 
-            $id = $event->getId();
+        $i = 1;
+        while ($this->eventRepository->countBySlug($slug, $id)) {
+            $slug = $slugger->slug($name.'-'.$i);
 
-            $i = 1;
-            while ($eventRepository->countBySlug($slug, $id)) {
-                $slug = $slugger->slug($name.'-'.$i);
-
-                ++$i;
-            }
-        } else {
-            // make sure the slug is formatted properly
-            $slug = $slugger->slug(strtolower($slug));
+            ++$i;
         }
 
         $event->setSlug($slug);
@@ -303,21 +296,19 @@ class EventBackendController extends AbstractController
     }
 
     private function save(
-        EventRepository $eventRepository,
         Event $event,
         FormInterface $form,
         Request $request
     ): void {
         $this->setTimezone($event, $form, $request);
 
-        $eventRepository->save($event, true);
+        $this->eventRepository->save($event, true);
     }
 
     #[Route('/event/{id}/delete', name: 'event_delete', methods: ['GET', 'POST'])]
     public function delete(
         Request $request,
         Event $event,
-        EventRepository $eventRepository
     ): Response {
         $this->denyAccessUnlessGranted(
             EventVoter::DELETE,
@@ -332,7 +323,7 @@ class EventBackendController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $eventRepository->remove($event, true);
+            $this->eventRepository->remove($event, true);
 
             $this->addFlash('notice', 'The event was deleted successfully.');
 
