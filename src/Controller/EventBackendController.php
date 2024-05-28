@@ -25,9 +25,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[Admin]
 class EventBackendController extends AbstractController
 {
-    public function __construct(private EventRepository $this->eventRepository)
+    public function __construct(private EventRepository $eventRepository)
     {
-
     }
 
     #[Route('/events/{status}', name: 'event_index', methods: ['GET'], requirements: ['status' => 'upcoming|past'])]
