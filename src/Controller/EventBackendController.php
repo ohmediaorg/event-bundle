@@ -88,10 +88,10 @@ class EventBackendController extends AbstractController
         if ($form->isSubmitted()) {
             $this->validateTimes($form);
 
-            $this->setSlug($this->eventRepository, $event);
+            $this->setSlug($event);
 
             if ($form->isValid()) {
-                $this->save($this->eventRepository, $event, $form, $request);
+                $this->save($event, $form, $request);
 
                 $this->addFlash('notice', 'The event was created successfully.');
 
@@ -125,10 +125,10 @@ class EventBackendController extends AbstractController
         if ($form->isSubmitted()) {
             $this->validateTimes($form);
 
-            $this->setSlug($this->eventRepository, $event);
+            $this->setSlug($event);
 
             if ($form->isValid()) {
-                $this->save($this->eventRepository, $event, $form, $request);
+                $this->save($event, $form, $request);
 
                 $this->addFlash('notice', 'The event was updated successfully.');
 
@@ -183,7 +183,7 @@ class EventBackendController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-            $this->setSlug($this->eventRepository, $newEvent);
+            $this->setSlug($newEvent);
 
             if ($form->isValid()) {
                 $amount = $form->get('amount')->getData();
