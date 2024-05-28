@@ -310,10 +310,6 @@ class EventBackendController extends AbstractController
     ): void {
         $this->setTimezone($event, $form, $request);
 
-        foreach ($event->getTimes() as $time) {
-            $time->setEvent($event);
-        }
-
         $eventRepository->save($event, true);
     }
 

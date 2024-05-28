@@ -64,6 +64,7 @@ class EventType extends AbstractType
             'entry_options' => [
                 'timezone' => $event->getTimezone(),
             ],
+            'by_reference' => false,
         ]);
 
         $builder->add('published_at', DateTimeType::class, [
