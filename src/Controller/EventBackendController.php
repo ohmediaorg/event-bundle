@@ -10,6 +10,7 @@ use OHMedia\EventBundle\Form\EventType;
 use OHMedia\EventBundle\Repository\EventRepository;
 use OHMedia\EventBundle\Security\Voter\EventVoter;
 use OHMedia\SecurityBundle\Form\DeleteType;
+use OHMedia\UtilityBundle\Service\EntitySlugger;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -19,14 +20,15 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[Admin]
 class EventBackendController extends AbstractController
 {
-    public function __construct(private EventRepository $eventRepository)
-    {
+    public function __construct(
+        private EventRepository $eventRepository,
+        private EntitySlugger $entitySlugger,
+    ) {
     }
 
     #[Route('/events/{status}', name: 'event_index', methods: ['GET'], requirements: ['status' => 'upcoming|past'])]
@@ -253,23 +255,7 @@ class EventBackendController extends AbstractController
 
     private function setSlug(Event $event): void
     {
-        $slugger = new AsciiSlugger();
-
-        // create a unique slug
-        $name = strtolower($event->getName());
-
-        $slug = $slugger->slug($name);
-
-        $id = $event->getId();
-
-        $i = 1;
-        while ($this->eventRepository->countBySlug($slug, $id)) {
-            $slug = $slugger->slug($name.'-'.$i);
-
-            ++$i;
-        }
-
-        $event->setSlug($slug);
+        $this->entitySlugger->setSlug($event, $event->getName());
     }
 
     private function setTimezone(

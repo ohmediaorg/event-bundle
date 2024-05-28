@@ -9,14 +9,17 @@ use Doctrine\ORM\Mapping as ORM;
 use OHMedia\EventBundle\Repository\EventRepository;
 use OHMedia\FileBundle\Entity\File;
 use OHMedia\SecurityBundle\Entity\Traits\BlameableTrait;
+use OHMedia\UtilityBundle\Entity\SluggableEntityInterface;
+use OHMedia\UtilityBundle\Entity\SluggableEntityTrait;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 #[UniqueEntity('slug')]
-class Event
+class Event implements SluggableEntityInterface
 {
     use BlameableTrait;
+    use SluggableEntityTrait;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -28,10 +31,6 @@ class Event
     #[Assert\NotNull]
     #[Assert\Length(max: 255)]
     private ?string $name = null;
-
-    #[ORM\Column(length: 255, unique: true)]
-    #[Assert\Length(max: 255)]
-    private ?string $slug = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
@@ -106,18 +105,6 @@ class Event
     public function setName(string $name): static
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getSlug(): ?string
-    {
-        return $this->slug;
-    }
-
-    public function setSlug(string $slug): static
-    {
-        $this->slug = $slug;
 
         return $this;
     }
