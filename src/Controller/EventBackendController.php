@@ -99,6 +99,8 @@ class EventBackendController extends AbstractController
 
                 return $this->redirectToRoute('event_index');
             }
+
+            $this->addFlash('error', 'There are some errors in the form below.');
         }
 
         return $this->render('@OHMediaEvent/event/event_create.html.twig', [
@@ -136,6 +138,8 @@ class EventBackendController extends AbstractController
 
                 return $this->redirectToRoute('event_index');
             }
+
+            $this->addFlash('error', 'There are some errors in the form below.');
         }
 
         return $this->render('@OHMediaEvent/event/event_edit.html.twig', [
@@ -209,6 +213,8 @@ class EventBackendController extends AbstractController
                     'id' => $newEvent->getId(),
                 ]);
             }
+
+            $this->addFlash('error', 'There are some errors in the form below.');
         }
 
         return $this->render('@OHMediaEvent/event/event_duplicate.html.twig', [
@@ -307,12 +313,16 @@ class EventBackendController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->eventRepository->remove($event, true);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $this->eventRepository->remove($event, true);
 
-            $this->addFlash('notice', 'The event was deleted successfully.');
+                $this->addFlash('notice', 'The event was deleted successfully.');
 
-            return $this->redirectToRoute('event_index');
+                return $this->redirectToRoute('event_index');
+            }
+
+            $this->addFlash('error', 'There are some errors in the form below.');
         }
 
         return $this->render('@OHMediaEvent/event/event_delete.html.twig', [
