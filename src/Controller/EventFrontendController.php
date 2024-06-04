@@ -83,7 +83,7 @@ class EventFrontendController extends AbstractController
 
         $image = $event->getImage();
 
-        if ($image && $image->getPath()) {
+        if ($image) {
             $path = $this->fileManager->getWebPath($image);
 
             $schema['image'] = $this->urlHelper->getAbsoluteUrl($path);
