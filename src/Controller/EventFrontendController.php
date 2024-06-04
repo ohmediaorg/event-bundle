@@ -21,7 +21,7 @@ class EventFrontendController extends AbstractController
         $qb->andWhere('e.published_at < CURRENT_TIMESTAMP()');
 
         return $this->render('@OHMediaEvent/events.html.twig', [
-            'pagination' => $paginator->paginate($qb, 20),
+            'pagination' => $paginator->paginate($qb, 12),
         ]);
     }
 
