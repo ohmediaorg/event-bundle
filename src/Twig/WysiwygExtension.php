@@ -9,7 +9,6 @@ use OHMedia\FileBundle\Service\FileManager;
 use OHMedia\MetaBundle\Entity\Meta;
 use OHMedia\PageBundle\Service\PageRenderer;
 use OHMedia\SettingsBundle\Service\Settings;
-use OHMedia\TimezoneBundle\Util\DateTimeUtil;
 use OHMedia\WysiwygBundle\Twig\AbstractWysiwygExtension;
 use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -40,10 +39,7 @@ class WysiwygExtension extends AbstractWysiwygExtension
 
     public function events(Environment $twig): string
     {
-        $qb = $this->eventRepository->getUpcomingQueryBuilderOrdered();
-        $qb->where('e.published_at IS NOT NULL');
-        $qb->andWhere('e.published_at < :now');
-        $qb->setParameter('now', DateTimeUtil::getDateTimeUtc());
+        $qb = $this->eventRepository->getFrontendQueryBuilder();
 
         $pagePath = $this->pageRenderer->getCurrentPage()->getPath();
 

@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use OHMedia\EventBundle\Entity\Event;
+use OHMedia\TimezoneBundle\Util\DateTimeUtil;
 
 /**
  * @method Event|null find($id, $lockMode = null, $lockVersion = null)
@@ -45,7 +46,9 @@ class EventRepository extends ServiceEntityRepository
                 SELECT MAX(et.ends_at)
                 FROM OHMedia\EventBundle\Entity\EventTime et
                 WHERE IDENTITY(et.event) = e.id
-            ) > CURRENT_TIMESTAMP()');
+            ) > :now')
+            ->setParameter('now', DateTimeUtil::getDateTimeUtc())
+        ;
     }
 
     public function getPastQueryBuilder(): QueryBuilder
@@ -55,7 +58,9 @@ class EventRepository extends ServiceEntityRepository
                 SELECT MAX(et.ends_at)
                 FROM OHMedia\EventBundle\Entity\EventTime et
                 WHERE IDENTITY(et.event) = e.id
-            ) < CURRENT_TIMESTAMP()');
+            ) < :now')
+            ->setParameter('now', DateTimeUtil::getDateTimeUtc())
+        ;
     }
 
     public function getUpcomingQueryBuilderOrdered(): QueryBuilder
@@ -65,7 +70,7 @@ class EventRepository extends ServiceEntityRepository
                 SELECT MIN(et2.starts_at)
                 FROM OHMedia\EventBundle\Entity\EventTime et2
                 WHERE IDENTITY(et2.event) = e.id
-                AND et2.ends_at > CURRENT_TIMESTAMP()
+                AND et2.ends_at > :now
             ) AS HIDDEN starts_at')
             ->orderBy('starts_at', 'ASC');
     }
@@ -79,5 +84,13 @@ class EventRepository extends ServiceEntityRepository
                 WHERE IDENTITY(et2.event) = e.id
             ) AS HIDDEN ends_at')
             ->orderBy('ends_at', 'DESC');
+    }
+
+    public function getFrontendQueryBuilder(): QueryBuilder
+    {
+        return $this->getUpcomingQueryBuilderOrdered()
+            ->where('e.published_at IS NOT NULL')
+            ->andWhere('e.published_at < :now')
+        ;
     }
 }
