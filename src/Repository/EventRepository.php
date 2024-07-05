@@ -89,7 +89,7 @@ class EventRepository extends ServiceEntityRepository
     public function getFrontendQueryBuilder(): QueryBuilder
     {
         return $this->getUpcomingQueryBuilderOrdered()
-            ->where('e.published_at IS NOT NULL')
+            ->andWhere('e.published_at IS NOT NULL')
             ->andWhere('e.published_at < :now')
         ;
     }
