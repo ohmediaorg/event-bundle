@@ -35,7 +35,7 @@ class UpcomingEventsExtension extends AbstractWysiwygExtension
         $qb = $this->eventRepository->getFrontendQueryBuilder();
         $qb->setMaxResults($limit);
 
-        $events = $qb->getQuery()->getResults();
+        $events = $qb->getQuery()->getResult();
 
         $pagePath = $this->pageRawQuery->getPathWithShortcode('events()');
 
