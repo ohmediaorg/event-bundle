@@ -8,7 +8,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use OHMedia\EventBundle\Repository\EventRepository;
 use OHMedia\FileBundle\Entity\File;
-use OHMedia\SecurityBundle\Entity\Traits\BlameableTrait;
+use OHMedia\UtilityBundle\Entity\BlameableEntityTrait;
 use OHMedia\UtilityBundle\Entity\SluggableEntityInterface;
 use OHMedia\UtilityBundle\Entity\SluggableEntityTrait;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity('slug')]
 class Event implements SluggableEntityInterface
 {
-    use BlameableTrait;
+    use BlameableEntityTrait;
     use SluggableEntityTrait;
 
     #[ORM\Id]
