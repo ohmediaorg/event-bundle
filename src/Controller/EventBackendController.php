@@ -9,7 +9,7 @@ use OHMedia\EventBundle\Entity\EventTime;
 use OHMedia\EventBundle\Form\EventType;
 use OHMedia\EventBundle\Repository\EventRepository;
 use OHMedia\EventBundle\Security\Voter\EventVoter;
-use OHMedia\SecurityBundle\Form\DeleteType;
+use OHMedia\UtilityBundle\Form\DeleteType;
 use OHMedia\UtilityBundle\Service\EntitySlugger;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
