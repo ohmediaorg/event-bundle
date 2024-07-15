@@ -17,6 +17,8 @@ use Twig\TwigFunction;
 
 class WysiwygExtension extends AbstractWysiwygExtension
 {
+    private bool $rendered = false;
+
     public function __construct(
         private EventRepository $eventRepository,
         private FileManager $fileManager,
@@ -39,6 +41,12 @@ class WysiwygExtension extends AbstractWysiwygExtension
 
     public function events(Environment $twig): string
     {
+        if ($this->rendered) {
+            return '';
+        }
+
+        $this->rendered = true;
+
         $qb = $this->eventRepository->getFrontendQueryBuilder();
 
         $pagePath = $this->pageRenderer->getCurrentPage()->getPath();
