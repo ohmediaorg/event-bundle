@@ -14,6 +14,6 @@ class EventShortcodeProvider extends AbstractShortcodeProvider
 
     public function buildShortcodes(): void
     {
-        $this->addShortcode(new Shortcode('Event Listing', 'events()'));
+        $this->addShortcode(new Shortcode('Event Listing', 'events()', true));
     }
 }
