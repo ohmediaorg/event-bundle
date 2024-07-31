@@ -71,7 +71,7 @@ class WysiwygExtension extends AbstractWysiwygExtension
 
                 $content = $twig->render('@OHMediaEvent/event_item.html.twig', [
                     'event' => $event,
-                    'page_path' => $pagePath,
+                    'events_page_path' => $pagePath,
                 ]);
 
                 $content .= $this->getSchema($event);
@@ -84,7 +84,7 @@ class WysiwygExtension extends AbstractWysiwygExtension
 
         return $twig->render('@OHMediaEvent/event_listing.html.twig', [
             'pagination' => $this->paginator->paginate($qb, 12),
-            'page_path' => $pagePath,
+            'events_page_path' => $pagePath,
         ]);
     }
 

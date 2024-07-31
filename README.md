@@ -29,12 +29,12 @@ the `events()` shortcode inside a page's WYSIWYG content.
 
 The listing template can be implemented by creating
 `templates/OHMediaEventBundle/event_listing.html.twig`. This template is passed
-two variables: `pagination` and `page_path`. Here is a basic implementation:
+two variables: `pagination` and `events_page_path`. Here is a basic implementation:
 
 ```twig
 <div id="events">
 {% for event in pagination.results %}
-  {% set href = page_path(page_path ~ '/' ~ event.slug) %}
+  {% set href = page_path(events_page_path ~ '/' ~ event.slug) %}
   <a href="{{ href }}">{{ event }}</a>
 
   {{ dump(event) }}
@@ -49,10 +49,10 @@ two variables: `pagination` and `page_path`. Here is a basic implementation:
 
 The item template can be implemented by creating
 `templates/OHMediaEventBundle/event_item.html.twig`. This template is passed
-two variables: `event` and `page_path`. Here is a basic implementation:
+two variables: `event` and `events_page_path`. Here is a basic implementation:
 
 ```twig
 {{ dump(event) }}
 
-<a href="page_path(page_path)">View All Events</a>
+<a href="page_path(events_page_path)">View All Events</a>
 ```
