@@ -41,7 +41,7 @@ class UpcomingEventsExtension extends AbstractWysiwygExtension
 
         return $twig->render('@OHMediaEvent/upcoming_events.html.twig', [
             'events' => $events,
-            'page_path' => $pagePath,
+            'events_page_path' => $pagePath,
         ]);
     }
 }
