@@ -47,7 +47,7 @@ class WysiwygExtension extends AbstractWysiwygExtension
     {
         $pageRevision = $this->pageRenderer->getCurrentPageRevision();
 
-        if ($pageRevision->containsShortcode('{{events()}}')) {
+        if ($pageRevision->containsShortcode('events()')) {
             $dynamicPageEvent->stopPropagation();
 
             $dynamicPart = $this->pageRenderer->getDynamicPart();
