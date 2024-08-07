@@ -47,37 +47,39 @@ class WysiwygExtension extends AbstractWysiwygExtension
     {
         $pageRevision = $this->pageRenderer->getCurrentPageRevision();
 
-        if ($pageRevision->containsShortcode('events()')) {
-            $dynamicPageEvent->stopPropagation();
-
-            $dynamicPart = $this->pageRenderer->getDynamicPart();
-
-            $qb = $this->eventRepository->getFrontendQueryBuilder();
-            $qb->andWhere('e.slug = :slug');
-            $qb->setParameter('slug', $dynamicPart);
-            $qb->setMaxResults(1);
-
-            $this->eventEntity = $qb->getQuery()->getOneOrNullResult();
-
-            if ($this->eventEntity) {
-                $meta = new Meta();
-                $meta->setTitle($this->eventEntity->getName());
-                $meta->setDescription($this->eventEntity->getSnippet());
-                $meta->setImage($this->eventEntity->getImage());
-                $meta->setAppendBaseTitle(true);
-
-                $this->pageRenderer->setDynamicMeta($meta);
-
-                $pagePath = $this->pageRenderer->getCurrentPage()->getPath();
-
-                $this->pageRenderer->addDynamicBreadcrumb(
-                    $this->eventEntity->getName(),
-                    $pagePath.'/'.$dynamicPart
-                );
-            } else {
-                throw new NotFoundHttpException('Event not found.');
-            }
+        if (!$pageRevision->containsShortcode('events()')) {
+            return;
         }
+
+        $dynamicPageEvent->stopPropagation();
+
+        $dynamicPart = $this->pageRenderer->getDynamicPart();
+
+        $qb = $this->eventRepository->getFrontendQueryBuilder();
+        $qb->andWhere('e.slug = :slug');
+        $qb->setParameter('slug', $dynamicPart);
+        $qb->setMaxResults(1);
+
+        $this->eventEntity = $qb->getQuery()->getOneOrNullResult();
+
+        if (!$this->eventEntity) {
+            throw new NotFoundHttpException('Event not found.');
+        }
+
+        $meta = new Meta();
+        $meta->setTitle($this->eventEntity->getName());
+        $meta->setDescription($this->eventEntity->getSnippet());
+        $meta->setImage($this->eventEntity->getImage());
+        $meta->setAppendBaseTitle(true);
+
+        $this->pageRenderer->setDynamicMeta($meta);
+
+        $pagePath = $this->pageRenderer->getCurrentPage()->getPath();
+
+        $this->pageRenderer->addDynamicBreadcrumb(
+            $this->eventEntity->getName(),
+            $pagePath.'/'.$dynamicPart
+        );
     }
 
     public function events(Environment $twig): string
