@@ -3,10 +3,13 @@
 namespace OHMedia\EventBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use OHMedia\EventBundle\Entity\Event;
 use OHMedia\TimezoneBundle\Util\DateTimeUtil;
+use OHMedia\WysiwygBundle\Repository\WysiwygRepositoryInterface;
 
 /**
  * @method Event|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,7 +17,7 @@ use OHMedia\TimezoneBundle\Util\DateTimeUtil;
  * @method Event[]    findAll()
  * @method Event[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class EventRepository extends ServiceEntityRepository
+class EventRepository extends ServiceEntityRepository implements WysiwygRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -92,5 +95,23 @@ class EventRepository extends ServiceEntityRepository
             ->andWhere('e.published_at IS NOT NULL')
             ->andWhere('e.published_at < :now')
         ;
+    }
+
+    public function containsWysiwygShortcodes(string ...$shortcodes): bool
+    {
+        $ors = [];
+        $params = new ArrayCollection();
+
+        foreach ($shortcodes as $i => $shortcode) {
+            $ors[] = 'e.description LIKE :shortcode_'.$i;
+            $params[] = new Parameter('shortcode_'.$i, '%'.$shortcode.'%');
+        }
+
+        return $this->createQueryBuilder('e')
+            ->select('COUNT(e)')
+            ->where(implode(' OR ', $ors))
+            ->setParameters($params)
+            ->getQuery()
+            ->getSingleScalarResult() > 0;
     }
 }
