@@ -92,7 +92,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const timePrototype = document.getElementById('time_prototype');
-  const timePrototypeName = {{ form.times.vars.prototype.vars.name|json_encode|raw }};
+  const timePrototypeName = {{ form.times.vars.prototype.vars.name|js }};
 
   const addTimeButton = document.getElementById('add_time');
   const timesContainer = document.getElementById('times_container');
