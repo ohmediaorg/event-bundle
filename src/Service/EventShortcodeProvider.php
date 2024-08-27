@@ -2,8 +2,8 @@
 
 namespace OHMedia\EventBundle\Service;
 
-use OHMedia\BackendBundle\Shortcodes\AbstractShortcodeProvider;
-use OHMedia\BackendBundle\Shortcodes\Shortcode;
+use OHMedia\WysiwygBundle\Shortcodes\AbstractShortcodeProvider;
+use OHMedia\WysiwygBundle\Shortcodes\Shortcode;
 
 class EventShortcodeProvider extends AbstractShortcodeProvider
 {
