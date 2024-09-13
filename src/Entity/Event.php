@@ -28,19 +28,16 @@ class Event implements SluggableEntityInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Assert\NotNull]
     #[Assert\Length(max: 255)]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Assert\NotNull]
     #[Assert\Length(max: 255)]
     private ?string $snippet = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank]
-    #[Assert\NotNull]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -56,7 +53,6 @@ class Event implements SluggableEntityInterface
 
     #[ORM\Column(length: 64)]
     #[Assert\NotBlank]
-    #[Assert\NotNull]
     #[Assert\Timezone]
     private ?string $timezone = null;
 
@@ -65,6 +61,7 @@ class Event implements SluggableEntityInterface
      */
     #[ORM\OneToMany(targetEntity: EventTime::class, mappedBy: 'event', orphanRemoval: true, cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['starts_at' => 'ASC'])]
+    #[Assert\Valid]
     private Collection $times;
 
     #[ORM\Column(nullable: true)]

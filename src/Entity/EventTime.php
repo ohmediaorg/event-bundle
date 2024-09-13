@@ -4,6 +4,7 @@ namespace OHMedia\EventBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use OHMedia\EventBundle\Repository\EventTimeRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventTimeRepository::class)]
 class EventTime
@@ -14,9 +15,12 @@ class EventTime
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank]
     private ?\DateTimeImmutable $starts_at = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank]
+    #[Assert\GreaterThan(propertyPath: 'starts_at', message: 'This value should be greater than Start.')]
     private ?\DateTimeImmutable $ends_at = null;
 
     #[ORM\ManyToOne(inversedBy: 'times')]
@@ -55,7 +59,7 @@ class EventTime
         return $this->starts_at;
     }
 
-    public function setStartsAt(\DateTimeImmutable $starts_at): static
+    public function setStartsAt(?\DateTimeImmutable $starts_at): static
     {
         $this->starts_at = $starts_at;
 
@@ -74,7 +78,7 @@ class EventTime
         return $this->ends_at;
     }
 
-    public function setEndsAt(\DateTimeImmutable $ends_at): static
+    public function setEndsAt(?\DateTimeImmutable $ends_at): static
     {
         $this->ends_at = $ends_at;
 

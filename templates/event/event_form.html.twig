@@ -10,6 +10,7 @@
         class: 'form-control-sm',
       },
     }) }}
+    {{ form_errors(form.starts_at) }}
   </td>
   <td>
     {{ form_widget(form.ends_at, {
@@ -17,6 +18,7 @@
         class: 'form-control-sm',
       },
     }) }}
+    {{ form_errors(form.ends_at) }}
   </td>
   <td>
     <a class="btn btn-danger btn-sm float-end" title="Delete" href="#" id="{{ form.vars.id }}_delete">
@@ -73,6 +75,9 @@
                 {% endfor %}
                 </tbody>
               </table>
+
+              {{ form_errors(form.times) }}
+
               <a class="btn btn-primary btn-sm" id="add_time" href="#">
                 {{ bootstrap_icon('plus') }}
                 Add Time

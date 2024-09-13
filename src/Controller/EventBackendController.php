@@ -234,25 +234,12 @@ class EventBackendController extends AbstractController
 
         $previousEndsAt = null;
         $overlapMessage = 'The times should not overlap.';
-        $startBeforeEndMessage = 'A Start time should be before its corresponding End time.';
 
         foreach ($formTimes as $formTime) {
             $time = $formTime->getData();
 
             if ($previousEndsAt && $time->getStartsAt() < $previousEndsAt) {
-                $this->addFlash('error', $overlapMessage);
-
-                $form->addError(new FormError($overlapMessage));
-
-                break;
-            }
-
-            if ($time->getStartsAt() > $time->getEndsAt()) {
-                $this->addFlash('error', $startBeforeEndMessage);
-
-                $form->addError(new FormError($startBeforeEndMessage));
-
-                break;
+                $formTime->get('starts_at')->addError(new FormError('This value is overlapping the previous end date.'));
             }
 
             $previousEndsAt = $time->getEndsAt();
