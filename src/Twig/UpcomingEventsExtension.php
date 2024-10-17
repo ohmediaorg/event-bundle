@@ -4,11 +4,11 @@ namespace OHMedia\EventBundle\Twig;
 
 use OHMedia\EventBundle\Repository\EventRepository;
 use OHMedia\PageBundle\Service\PageRawQuery;
-use OHMedia\WysiwygBundle\Twig\AbstractWysiwygExtension;
 use Twig\Environment;
+use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class UpcomingEventsExtension extends AbstractWysiwygExtension
+class UpcomingEventsExtension extends AbstractExtension
 {
     public function __construct(
         private EventRepository $eventRepository,
