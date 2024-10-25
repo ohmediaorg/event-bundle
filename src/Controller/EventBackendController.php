@@ -11,6 +11,7 @@ use OHMedia\EventBundle\Repository\EventRepository;
 use OHMedia\EventBundle\Security\Voter\EventVoter;
 use OHMedia\UtilityBundle\Form\DeleteType;
 use OHMedia\UtilityBundle\Service\EntitySlugger;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -112,7 +113,7 @@ class EventBackendController extends AbstractController
     #[Route('/event/{id}/edit', name: 'event_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
-        Event $event,
+        #[MapEntity(id: 'id')] Event $event,
     ): Response {
         $this->denyAccessUnlessGranted(
             EventVoter::EDIT,
@@ -151,7 +152,7 @@ class EventBackendController extends AbstractController
     #[Route('/event/{id}/duplicate', name: 'event_duplicate', methods: ['GET', 'POST'])]
     public function duplicate(
         Request $request,
-        Event $existingEvent,
+        #[MapEntity(id: 'id')] Event $existingEvent,
     ): Response {
         $this->denyAccessUnlessGranted(
             EventVoter::DUPLICATE,
@@ -286,7 +287,7 @@ class EventBackendController extends AbstractController
     #[Route('/event/{id}/delete', name: 'event_delete', methods: ['GET', 'POST'])]
     public function delete(
         Request $request,
-        Event $event,
+        #[MapEntity(id: 'id')] Event $event,
     ): Response {
         $this->denyAccessUnlessGranted(
             EventVoter::DELETE,
