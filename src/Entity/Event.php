@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Persistence\Proxy;
 use OHMedia\EventBundle\Repository\EventRepository;
 use OHMedia\FileBundle\Entity\File;
 use OHMedia\UtilityBundle\Entity\BlameableEntityTrait;
@@ -74,13 +75,20 @@ class Event implements SluggableEntityInterface
 
     public function __clone()
     {
-        $this->id = null;
-        $this->slug = null;
-        $this->published_at = null;
-        $this->times = new ArrayCollection();
+        if ($this->id) {
+            if ($this instanceof Proxy && !$this->__isInitialized()) {
+                // Initialize the proxy to load all properties
+                $this->__load();
+            }
 
-        if ($this->image) {
-            $this->image = clone $this->image;
+            $this->id = null;
+            $this->slug = null;
+            $this->published_at = null;
+            $this->times = new ArrayCollection();
+
+            if ($this->image) {
+                $this->image = clone $this->image;
+            }
         }
     }
 
