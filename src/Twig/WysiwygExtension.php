@@ -47,11 +47,7 @@ class WysiwygExtension extends AbstractWysiwygExtension
     {
         $pageRevision = $this->pageRenderer->getCurrentPageRevision();
 
-        $callable = $pageRevision->getTemplate().'::getTemplate';
-
-        $isTemplate = is_callable($callable)
-            ? '@OHMediaEvent/events.html.twig' === call_user_func($callable)
-            : false;
+        $isTemplate = $pageRevision->isTemplate('@OHMediaEvent/events.html.twig');
 
         if (!$isTemplate && !$pageRevision->containsShortcode('events()')) {
             return;
