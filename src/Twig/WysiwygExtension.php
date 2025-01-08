@@ -11,6 +11,7 @@ use OHMedia\PageBundle\Event\DynamicPageEvent;
 use OHMedia\PageBundle\Service\PageRenderer;
 use OHMedia\SettingsBundle\Service\Settings;
 use OHMedia\WysiwygBundle\Twig\AbstractWysiwygExtension;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -30,6 +31,8 @@ class WysiwygExtension extends AbstractWysiwygExtension
         private Paginator $paginator,
         private Settings $settings,
         private UrlHelper $urlHelper,
+        #[Autowire('%oh_media_event.page_template%')]
+        private ?string $pageTemplate,
     ) {
     }
 
@@ -47,7 +50,7 @@ class WysiwygExtension extends AbstractWysiwygExtension
     {
         $pageRevision = $this->pageRenderer->getCurrentPageRevision();
 
-        $isTemplate = $pageRevision->isTemplate('@OHMediaEvent/events.html.twig');
+        $isTemplate = $pageRevision->isTemplate($this->pageTemplate);
 
         if (!$isTemplate && !$pageRevision->containsShortcode('events()')) {
             return;
