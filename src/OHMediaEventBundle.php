@@ -14,7 +14,8 @@ class OHMediaEventBundle extends AbstractBundle
         $definition->rootNode()
             ->children()
                 ->scalarNode('page_template')
-                    ->defaultNull()
+                    ->isRequired()
+                    ->cannotBeEmpty()
                 ->end()
             ->end()
         ;
