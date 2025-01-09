@@ -40,10 +40,7 @@ class UpcomingEventsExtension extends AbstractExtension
 
         $events = $qb->getQuery()->getResult();
 
-        $pagePath = $this->pageRawQuery->getPathWithShortcodeOrTemplate(
-            'events()',
-            $this->pageTemplate,
-        );
+        $pagePath = $this->pageRawQuery->getPathWithTemplate($this->pageTemplate);
 
         return $twig->render('@OHMediaEvent/upcoming_events.html.twig', [
             'events' => $events,

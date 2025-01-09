@@ -19,10 +19,7 @@ class EventSitemapUrlProvider extends AbstractSitemapUrlProvider
 
     protected function buildSitemapUrls(): void
     {
-        $pagePath = $this->pageRawQuery->getPathWithShortcodeOrTemplate(
-            'events()',
-            $this->pageTemplate,
-        );
+        $pagePath = $this->pageRawQuery->getPathWithTemplate($this->pageTemplate);
 
         if (!$pagePath) {
             return;
