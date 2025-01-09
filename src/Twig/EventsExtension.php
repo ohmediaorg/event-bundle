@@ -10,18 +10,17 @@ use OHMedia\MetaBundle\Entity\Meta;
 use OHMedia\PageBundle\Event\DynamicPageEvent;
 use OHMedia\PageBundle\Service\PageRenderer;
 use OHMedia\SettingsBundle\Service\Settings;
-use OHMedia\WysiwygBundle\Twig\AbstractWysiwygExtension;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Twig\Environment;
+use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 #[AsEventListener(event: DynamicPageEvent::class, method: 'onDynamicPageEvent')]
-class WysiwygExtension extends AbstractWysiwygExtension
+class EventsExtension extends AbstractExtension
 {
-    private bool $rendered = false;
     private ?Event $eventEntity = null;
 
     public function __construct(
@@ -89,12 +88,6 @@ class WysiwygExtension extends AbstractWysiwygExtension
 
     public function events(Environment $twig): string
     {
-        if ($this->rendered) {
-            return '';
-        }
-
-        $this->rendered = true;
-
         $pagePath = $this->pageRenderer->getCurrentPage()->getPath();
 
         if ($this->eventEntity) {
