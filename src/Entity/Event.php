@@ -131,7 +131,7 @@ class Event implements SluggableEntityInterface
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
 
