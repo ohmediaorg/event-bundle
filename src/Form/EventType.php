@@ -46,7 +46,6 @@ class EventType extends AbstractType
 
         $builder->add('image', FileEntityType::class, [
             'image' => true,
-            'data' => $event->getImage(),
             'required' => false,
         ]);
 
