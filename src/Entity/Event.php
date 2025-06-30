@@ -50,6 +50,7 @@ class Event implements SluggableEntityInterface
     private ?string $ticket_url = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[Assert\Valid]
     private ?File $image = null;
 
     #[ORM\Column(length: 64)]
