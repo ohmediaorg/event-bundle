@@ -27,9 +27,9 @@ class Event implements SluggableEntityInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 100)]
     #[Assert\NotBlank]
-    #[Assert\Length(max: 255)]
+    #[Assert\Length(max: 100)]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -41,12 +41,12 @@ class Event implements SluggableEntityInterface
     #[Assert\NotBlank]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\Length(max: 255)]
+    #[ORM\Column(length: 100, nullable: true)]
+    #[Assert\Length(max: 100)]
     private ?string $location = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\Length(max: 255)]
+    #[ORM\Column(length: 180, nullable: true)]
+    #[Assert\Length(max: 180)]
     private ?string $ticket_url = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
