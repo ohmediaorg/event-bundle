@@ -84,7 +84,7 @@ class EventBackendController extends AbstractController
 
         $form = $this->createForm(EventType::class, $event);
 
-        $form->add('submit', SubmitType::class);
+        $form->add('save', SubmitType::class);
 
         $form->handleRequest($request);
 
@@ -123,7 +123,7 @@ class EventBackendController extends AbstractController
 
         $form = $this->createForm(EventType::class, $event);
 
-        $form->add('submit', SubmitType::class);
+        $form->add('save', SubmitType::class);
 
         $form->handleRequest($request);
 
@@ -183,7 +183,7 @@ class EventBackendController extends AbstractController
             ],
         ]);
 
-        $formBuilder->add('submit', SubmitType::class);
+        $formBuilder->add('duplicate', SubmitType::class);
 
         $form = $formBuilder->getForm();
 
