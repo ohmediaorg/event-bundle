@@ -3,10 +3,12 @@
 namespace OHMedia\EventBundle\Form;
 
 use OHMedia\EventBundle\Entity\Event;
+use OHMedia\EventBundle\Entity\EventTag;
 use OHMedia\FileBundle\Form\Type\FileEntityType;
 use OHMedia\TimezoneBundle\Form\Type\DateTimeType;
 use OHMedia\TimezoneBundle\Service\Timezone;
 use OHMedia\WysiwygBundle\Form\Type\WysiwygType;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -19,8 +21,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EventType extends AbstractType
 {
-    public function __construct(private Timezone $timezone)
-    {
+    public function __construct(
+        private Timezone $timezone,
+        #[Autowire('%oh_media_event.event_tags%')]
+        private bool $eventTagsEnabled,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -48,6 +53,15 @@ class EventType extends AbstractType
             'image' => true,
             'required' => false,
         ]);
+
+        if ($this->eventTagsEnabled) {
+            $builder->add('tags', EntityType::class, [
+                'required' => false,
+                'class' => EventTag::class,
+                'multiple' => true,
+                'expanded' => true,
+            ]);
+        }
 
         $builder->add('timezone', TimezoneType::class, [
             'attr' => [
