@@ -1,14 +1,14 @@
 <?php
 
-namespace OHMedia\NewsBundle\Controller;
+namespace OHMedia\EventBundle\Controller;
 
 use OHMedia\BackendBundle\Routing\Attribute\Admin;
 use OHMedia\BootstrapBundle\Service\Paginator;
-use OHMedia\NewsBundle\Entity\Event;
-use OHMedia\NewsBundle\Entity\EventTag;
-use OHMedia\NewsBundle\Form\EventTagType;
-use OHMedia\NewsBundle\Repository\EventTagRepository;
-use OHMedia\NewsBundle\Security\Voter\EventTagVoter;
+use OHMedia\EventBundle\Entity\Event;
+use OHMedia\EventBundle\Entity\EventTag;
+use OHMedia\EventBundle\Form\EventTagType;
+use OHMedia\EventBundle\Repository\EventTagRepository;
+use OHMedia\EventBundle\Security\Voter\EventTagVoter;
 use OHMedia\UtilityBundle\Form\DeleteType;
 use OHMedia\UtilityBundle\Service\EntitySlugger;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -51,7 +51,7 @@ class EventTagBackendController extends AbstractController
 
         $qb->orderBy('at.id', 'desc');
 
-        return $this->render('@OHMediaNews/backend/event_tag/event_tag_index.html.twig', [
+        return $this->render('@OHMediaEvent/backend/event_tag/event_tag_index.html.twig', [
             'pagination' => $paginator->paginate($qb, 20),
             'new_event_tag' => $newEventTag,
             'attributes' => $this->getAttributes(),
@@ -91,7 +91,7 @@ class EventTagBackendController extends AbstractController
             $this->addFlash('error', 'There are some errors in the form below.');
         }
 
-        return $this->render('@OHMediaNews/backend/event_tag/event_tag_create.html.twig', [
+        return $this->render('@OHMediaEvent/backend/event_tag/event_tag_create.html.twig', [
             'form' => $form->createView(),
             'event_tag' => $eventTag,
         ]);
@@ -131,7 +131,7 @@ class EventTagBackendController extends AbstractController
             $this->addFlash('error', 'There are some errors in the form below.');
         }
 
-        return $this->render('@OHMediaNews/backend/event_tag/event_tag_edit.html.twig', [
+        return $this->render('@OHMediaEvent/backend/event_tag/event_tag_edit.html.twig', [
             'form' => $form->createView(),
             'event_tag' => $eventTag,
         ]);
@@ -167,7 +167,7 @@ class EventTagBackendController extends AbstractController
             $this->addFlash('error', 'There are some errors in the form below.');
         }
 
-        return $this->render('@OHMediaNews/backend/event_tag/event_tag_delete.html.twig', [
+        return $this->render('@OHMediaEvent/backend/event_tag/event_tag_delete.html.twig', [
             'form' => $form->createView(),
             'event_tag' => $eventTag,
         ]);

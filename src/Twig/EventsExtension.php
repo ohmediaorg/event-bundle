@@ -5,9 +5,9 @@ namespace OHMedia\EventBundle\Twig;
 use OHMedia\BootstrapBundle\Service\Paginator;
 use OHMedia\EventBundle\Entity\Event;
 use OHMedia\EventBundle\Repository\EventRepository;
+use OHMedia\EventBundle\Repository\EventTagRepository;
 use OHMedia\FileBundle\Service\FileManager;
 use OHMedia\MetaBundle\Entity\Meta;
-use OHMedia\NewsBundle\Repository\EventTagRepository;
 use OHMedia\PageBundle\Event\DynamicPageEvent;
 use OHMedia\PageBundle\Service\PageRenderer;
 use OHMedia\SettingsBundle\Service\Settings;
@@ -32,7 +32,7 @@ class EventsExtension extends AbstractExtension
         private Settings $settings,
         private UrlHelper $urlHelper,
         private EventTagRepository $eventTagRepository,
-        #[Autowire('%oh_media_news.event_tags%')]
+        #[Autowire('%oh_media_event.event_tags%')]
         private bool $eventTagsEnabled,
         private RequestStack $requestStack,
         #[Autowire('%oh_media_event.page_template%')]

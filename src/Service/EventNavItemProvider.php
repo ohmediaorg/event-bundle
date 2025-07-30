@@ -7,9 +7,9 @@ use OHMedia\BootstrapBundle\Component\Nav\NavDropdown;
 use OHMedia\BootstrapBundle\Component\Nav\NavItemInterface;
 use OHMedia\BootstrapBundle\Component\Nav\NavLink;
 use OHMedia\EventBundle\Entity\Event;
+use OHMedia\EventBundle\Entity\EventTag;
+use OHMedia\EventBundle\Security\Voter\EventTagVoter;
 use OHMedia\EventBundle\Security\Voter\EventVoter;
-use OHMedia\NewsBundle\Entity\EventTag;
-use OHMedia\NewsBundle\Security\Voter\EventTagVoter;
 
 class EventNavItemProvider extends AbstractNavItemProvider
 {

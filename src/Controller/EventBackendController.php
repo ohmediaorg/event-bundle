@@ -37,7 +37,7 @@ class EventBackendController extends AbstractController
     #[Route('/events/{status}', name: 'event_index', methods: ['GET'], requirements: ['status' => 'upcoming|past'])]
     public function index(
         Paginator $paginator,
-        #[Autowire('%oh_media_news.event_tags%')]
+        #[Autowire('%oh_media_event.event_tags%')]
         bool $eventTagsEnabled,
         string $status = 'upcoming',
     ): Response {
