@@ -32,6 +32,6 @@ class EventNavItemProvider extends AbstractNavItemProvider
             $nav->addLink($tags);
         }
 
-        return null;
+        return $nav;
     }
 }

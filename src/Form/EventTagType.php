@@ -2,16 +2,16 @@
 
 namespace OHMedia\EventBundle\Form;
 
-use OHMedia\EventBundle\Entity\EventEvent;
+use OHMedia\EventBundle\Entity\EventTag;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class EventEventType extends AbstractType
+class EventTagType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $eventEvent = $options['data'];
+        $eventTag = $options['data'];
 
         $builder->add('name');
     }
@@ -19,7 +19,7 @@ class EventEventType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => EventEvent::class,
+            'data_class' => EventTag::class,
         ]);
     }
 }
