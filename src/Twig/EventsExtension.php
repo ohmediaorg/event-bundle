@@ -11,11 +11,13 @@ use OHMedia\MetaBundle\Entity\Meta;
 use OHMedia\PageBundle\Event\DynamicPageEvent;
 use OHMedia\PageBundle\Service\PageRenderer;
 use OHMedia\SettingsBundle\Service\Settings;
+use OHMedia\TimezoneBundle\Util\DateTimeUtil;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -32,6 +34,7 @@ class EventsExtension extends AbstractExtension
         private Paginator $paginator,
         private Settings $settings,
         private UrlHelper $urlHelper,
+        private UrlGeneratorInterface $urlGenerator,
         private EventTagRepository $eventTagRepository,
         #[Autowire('%oh_media_event.event_tags%')]
         private bool $eventTagsEnabled,
@@ -121,7 +124,7 @@ class EventsExtension extends AbstractExtension
                 [];
 
             if ($activeTags) {
-                $qb->innerJoin('a.tags', 't');
+                $qb->innerJoin('e.tags', 't');
                 $qb->andWhere('t.slug IN (:tags)');
                 $qb->setParameter('tags', $activeTags);
             }
@@ -150,11 +153,11 @@ class EventsExtension extends AbstractExtension
 
         $tagsArray = [];
 
-        $tags = $this->eventTagRepository->createQueryBuilder('at')
-            ->select('at')
-            ->innerJoin('at.events', 'a')
-            ->where('a.published_at IS NOT NULL')
-            ->andWhere('a.published_at <= :now')
+        $tags = $this->eventTagRepository->createQueryBuilder('et')
+            ->select('et')
+            ->innerJoin('et.events', 'e')
+            ->where('e.published_at IS NOT NULL')
+            ->andWhere('e.published_at <= :now')
             ->setParameter('now', DateTimeUtil::getDateTimeUtc())
             ->getQuery()
             ->getResult();
