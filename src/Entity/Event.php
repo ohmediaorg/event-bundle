@@ -69,9 +69,16 @@ class Event implements SluggableEntityInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $published_at = null;
 
+    /**
+     * @var Collection<int, EventTag>
+     */
+    #[ORM\ManyToMany(targetEntity: EventTag::class, inversedBy: 'events')]
+    private Collection $tags;
+
     public function __construct()
     {
         $this->times = new ArrayCollection();
+        $this->tags = new ArrayCollection();
     }
 
     public function __clone()
@@ -240,5 +247,29 @@ class Event implements SluggableEntityInterface
         $now = new \DateTime('now', $utc);
 
         return $this->published_at->setTimezone($utc) < $now;
+    }
+
+    /**
+     * @return Collection<int, EventTag>
+     */
+    public function getTags(): Collection
+    {
+        return $this->tags;
+    }
+
+    public function addTag(EventTag $tag): static
+    {
+        if (!$this->tags->contains($tag)) {
+            $this->tags->add($tag);
+        }
+
+        return $this;
+    }
+
+    public function removeTag(EventTag $tag): static
+    {
+        $this->tags->removeElement($tag);
+
+        return $this;
     }
 }
