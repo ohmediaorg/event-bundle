@@ -51,7 +51,7 @@ class EventTagBackendController extends AbstractController
 
         $qb->orderBy('at.id', 'desc');
 
-        return $this->render('@OHMediaEvent/backend/event_tag/event_tag_index.html.twig', [
+        return $this->render('@OHMediaEvent/event_tag/event_tag_index.html.twig', [
             'pagination' => $paginator->paginate($qb, 20),
             'new_event_tag' => $newEventTag,
             'attributes' => $this->getAttributes(),
@@ -91,7 +91,7 @@ class EventTagBackendController extends AbstractController
             $this->addFlash('error', 'There are some errors in the form below.');
         }
 
-        return $this->render('@OHMediaEvent/backend/event_tag/event_tag_create.html.twig', [
+        return $this->render('@OHMediaEvent/event_tag/event_tag_create.html.twig', [
             'form' => $form->createView(),
             'event_tag' => $eventTag,
         ]);
@@ -131,7 +131,7 @@ class EventTagBackendController extends AbstractController
             $this->addFlash('error', 'There are some errors in the form below.');
         }
 
-        return $this->render('@OHMediaEvent/backend/event_tag/event_tag_edit.html.twig', [
+        return $this->render('@OHMediaEvent/event_tag/event_tag_edit.html.twig', [
             'form' => $form->createView(),
             'event_tag' => $eventTag,
         ]);
@@ -167,7 +167,7 @@ class EventTagBackendController extends AbstractController
             $this->addFlash('error', 'There are some errors in the form below.');
         }
 
-        return $this->render('@OHMediaEvent/backend/event_tag/event_tag_delete.html.twig', [
+        return $this->render('@OHMediaEvent/event_tag/event_tag_delete.html.twig', [
             'form' => $form->createView(),
             'event_tag' => $eventTag,
         ]);

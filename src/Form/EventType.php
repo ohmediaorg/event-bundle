@@ -8,6 +8,7 @@ use OHMedia\FileBundle\Form\Type\FileEntityType;
 use OHMedia\TimezoneBundle\Form\Type\DateTimeType;
 use OHMedia\TimezoneBundle\Service\Timezone;
 use OHMedia\WysiwygBundle\Form\Type\WysiwygType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -60,6 +61,9 @@ class EventType extends AbstractType
                 'class' => EventTag::class,
                 'multiple' => true,
                 'expanded' => true,
+                'row_attr' => [
+                    'class' => 'fieldset-nostyle mb-3',
+                ],
             ]);
         }
 
