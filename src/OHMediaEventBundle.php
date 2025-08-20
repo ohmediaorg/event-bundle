@@ -13,6 +13,9 @@ class OHMediaEventBundle extends AbstractBundle
     {
         $definition->rootNode()
             ->children()
+                ->booleanNode('event_tags')
+                    ->defaultFalse()
+                ->end()
                 ->scalarNode('page_template')
                     ->isRequired()
                     ->cannotBeEmpty()
@@ -29,6 +32,7 @@ class OHMediaEventBundle extends AbstractBundle
         $containerConfigurator->import('../config/services.yaml');
 
         $containerConfigurator->parameters()
+            ->set('oh_media_event.event_tags', $config['event_tags'])
             ->set('oh_media_event.page_template', $config['page_template'])
         ;
     }

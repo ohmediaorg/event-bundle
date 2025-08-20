@@ -9,14 +9,21 @@
 {% endblock %}
 
 {% set can_create_event = is_granted(attributes.create, new_event) %}
-
 {% set create_event_href = path('event_create') %}
+
+{% set can_view_event_tag = is_granted(attributes.view_tags, new_event_tag) %}
+{% set view_event_tags_href = path('event_tag_index') %}
 
 {% block actions %}
 <div class="btn-group btn-group-sm">
   {% if can_create_event %}
     <a href="{{ create_event_href }}" class="btn btn-primary">
       {{ bootstrap_icon('plus') }} Add Event
+    </a>
+  {% endif %}
+  {% if can_view_event_tag %}
+    <a href="{{ view_event_tags_href }}" class="btn btn-primary">
+      {{ bootstrap_icon('tag') }} Tags
     </a>
   {% endif %}
   {% if is_past %}
@@ -53,6 +60,9 @@
           <tr>
             <th>Name</th>
             <th>Times</th>
+            {% if event_tags_enabled %}
+              <th>Tags</th>
+            {% endif %}
             <th>Last Updated</th>
             <th></th>
           </tr>
@@ -78,6 +88,13 @@
               <small class="d-block">{{ time }}</small>
               {% endfor %}
             </td>
+            {% if event_tags_enabled %}
+              <td>
+                {% for tag in event.getTags %}
+                  {{ bootstrap_badge_secondary(tag.name) }} <br>
+                {% endfor %}
+              </td>
+            {% endif %}
             <td>{{ event.updatedAt|datetime }}</td>
             <td>
               {% if is_granted(attributes.edit, event) %}
