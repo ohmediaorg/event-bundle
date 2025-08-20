@@ -3,6 +3,7 @@
 namespace OHMedia\EventBundle\Service;
 
 use OHMedia\EventBundle\Entity\Event;
+use OHMedia\EventBundle\Entity\EventTag;
 use OHMedia\SecurityBundle\Service\EntityChoiceInterface;
 
 class EventEntityChoice implements EntityChoiceInterface
@@ -14,6 +15,9 @@ class EventEntityChoice implements EntityChoiceInterface
 
     public function getEntities(): array
     {
-        return [Event::class];
+        return [
+            Event::class,
+            EventTag::class,
+        ];
     }
 }

@@ -5,14 +5,17 @@ namespace OHMedia\EventBundle\Controller;
 use OHMedia\BackendBundle\Routing\Attribute\Admin;
 use OHMedia\BootstrapBundle\Service\Paginator;
 use OHMedia\EventBundle\Entity\Event;
+use OHMedia\EventBundle\Entity\EventTag;
 use OHMedia\EventBundle\Entity\EventTime;
 use OHMedia\EventBundle\Form\EventType;
 use OHMedia\EventBundle\Repository\EventRepository;
+use OHMedia\EventBundle\Security\Voter\EventTagVoter;
 use OHMedia\EventBundle\Security\Voter\EventVoter;
 use OHMedia\UtilityBundle\Form\DeleteType;
 use OHMedia\UtilityBundle\Service\EntitySlugger;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -35,9 +38,12 @@ class EventBackendController extends AbstractController
     #[Route('/events/{status}', name: 'event_index', methods: ['GET'], requirements: ['status' => 'upcoming|past'])]
     public function index(
         Paginator $paginator,
+        #[Autowire('%oh_media_event.event_tags%')]
+        bool $eventTagsEnabled,
         string $status = 'upcoming',
     ): Response {
         $newEvent = new Event();
+        $newEventTag = new EventTag();
 
         $this->denyAccessUnlessGranted(
             EventVoter::INDEX,
@@ -64,10 +70,12 @@ class EventBackendController extends AbstractController
         return $this->render('@OHMediaEvent/event/event_index.html.twig', [
             'pagination' => $paginator->paginate($currentQb, 20),
             'new_event' => $newEvent,
+            'new_event_tag' => $newEventTag,
             'attributes' => $this->getAttributes(),
             'other_count' => $otherCount,
             'is_past' => $isPast,
             'title' => $title,
+            'event_tags_enabled' => $eventTagsEnabled,
         ]);
     }
 
@@ -326,6 +334,7 @@ class EventBackendController extends AbstractController
             'delete' => EventVoter::DELETE,
             'edit' => EventVoter::EDIT,
             'duplicate' => EventVoter::DUPLICATE,
+            'view_tags' => EventTagVoter::VIEW,
         ];
     }
 }
