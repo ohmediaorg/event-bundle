@@ -3,8 +3,6 @@
 namespace OHMedia\EventBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use OHMedia\EventBundle\Entity\Event;
@@ -97,21 +95,25 @@ class EventRepository extends ServiceEntityRepository implements WysiwygReposito
         ;
     }
 
-    public function containsWysiwygShortcodes(string ...$shortcodes): bool
+    public function getShortcodeQueryBuilder(string $shortcode): QueryBuilder
     {
-        $ors = [];
-        $params = new ArrayCollection();
-
-        foreach ($shortcodes as $i => $shortcode) {
-            $ors[] = 'e.description LIKE :shortcode_'.$i;
-            $params[] = new Parameter('shortcode_'.$i, '%'.$shortcode.'%');
-        }
-
         return $this->createQueryBuilder('e')
-            ->select('COUNT(e)')
-            ->where(implode(' OR ', $ors))
-            ->setParameters($params)
-            ->getQuery()
-            ->getSingleScalarResult() > 0;
+            ->where('e.description LIKE :shortcode')
+            ->setParameter('shortcode', '%'.$shortcode.'%');
+    }
+
+    public function getEntityRoute(): string
+    {
+        return 'event_edit';
+    }
+
+    public function getEntityRouteParams(mixed $entity): array
+    {
+        return ['id' => $entity->getId()];
+    }
+
+    public function getEntityName(): string
+    {
+        return 'Event';
     }
 }
