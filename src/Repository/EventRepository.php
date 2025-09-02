@@ -102,18 +102,27 @@ class EventRepository extends ServiceEntityRepository implements WysiwygReposito
             ->setParameter('shortcode', '%'.$shortcode.'%');
     }
 
-    public function getEntityRoute(): string
+    public function getShortcodeRoute(): string
     {
         return 'event_edit';
     }
 
-    public function getEntityRouteParams(mixed $entity): array
+    public function getShortcodeRouteParams(mixed $entity): array
     {
         return ['id' => $entity->getId()];
     }
 
-    public function getEntityName(): string
+    public function getShortcodeHeading(): string
     {
-        return 'Event';
+        return 'Events';
+    }
+
+    public function getShortcodeLinkText(mixed $entity): string
+    {
+        return sprintf(
+            '%s (ID:%s)',
+            (string) $entity,
+            $entity->getId(),
+        );
     }
 }
