@@ -257,6 +257,14 @@ class Event implements SluggableEntityInterface
         return $this->tags;
     }
 
+    // Used in a listener when tags are disabled
+    public function clearTags(): static
+    {
+        $this->tags = new ArrayCollection();
+
+        return $this;
+    }
+
     public function addTag(EventTag $tag): static
     {
         if (!$this->tags->contains($tag)) {
