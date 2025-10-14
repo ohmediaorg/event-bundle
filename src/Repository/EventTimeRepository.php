@@ -2,9 +2,9 @@
 
 namespace OHMedia\EventBundle\Repository;
 
-use App\Entity\EventTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use OHMedia\EventBundle\Entity\EventTime;
 
 /**
  * @extends ServiceEntityRepository<EventTime>
