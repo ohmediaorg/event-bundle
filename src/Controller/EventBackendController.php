@@ -2,6 +2,7 @@
 
 namespace OHMedia\EventBundle\Controller;
 
+use OHMedia\BackendBundle\Form\MultiSaveType;
 use OHMedia\BackendBundle\Routing\Attribute\Admin;
 use OHMedia\BootstrapBundle\Service\Paginator;
 use OHMedia\EventBundle\Entity\Event;
@@ -92,7 +93,7 @@ class EventBackendController extends AbstractController
 
         $form = $this->createForm(EventType::class, $event);
 
-        $form->add('save', SubmitType::class);
+        $form->add('save', MultiSaveType::class);
 
         $form->handleRequest($request);
 
@@ -106,7 +107,7 @@ class EventBackendController extends AbstractController
 
                 $this->addFlash('notice', 'The event was created successfully.');
 
-                return $this->redirectToRoute('event_index');
+                return $this->redirectForm($event, $form);
             }
 
             $this->addFlash('error', 'There are some errors in the form below.');
@@ -131,7 +132,7 @@ class EventBackendController extends AbstractController
 
         $form = $this->createForm(EventType::class, $event);
 
-        $form->add('save', SubmitType::class);
+        $form->add('save', MultiSaveType::class);
 
         $form->handleRequest($request);
 
@@ -145,7 +146,7 @@ class EventBackendController extends AbstractController
 
                 $this->addFlash('notice', 'The event was updated successfully.');
 
-                return $this->redirectToRoute('event_index');
+                return $this->redirectForm($event, $form);
             }
 
             $this->addFlash('error', 'There are some errors in the form below.');
@@ -155,6 +156,21 @@ class EventBackendController extends AbstractController
             'form' => $form->createView(),
             'event' => $event,
         ]);
+    }
+
+    private function redirectForm(Event $event, FormInterface $form): Response
+    {
+        $clickedButtonName = $form->getClickedButton()->getName() ?? null;
+
+        if ('keep_editing' === $clickedButtonName) {
+            return $this->redirectToRoute('event_edit', [
+                'id' => $event->getId(),
+            ]);
+        } elseif ('add_another' === $clickedButtonName) {
+            return $this->redirectToRoute('event_create');
+        } else {
+            return $this->redirectToRoute('event_index');
+        }
     }
 
     #[Route('/event/{id}/duplicate', name: 'event_duplicate', methods: ['GET', 'POST'])]

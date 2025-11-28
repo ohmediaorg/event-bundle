@@ -2,6 +2,7 @@
 
 namespace OHMedia\EventBundle\Controller;
 
+use OHMedia\BackendBundle\Form\MultiSaveType;
 use OHMedia\BackendBundle\Routing\Attribute\Admin;
 use OHMedia\BootstrapBundle\Service\Paginator;
 use OHMedia\EventBundle\Entity\Event;
@@ -14,6 +15,7 @@ use OHMedia\UtilityBundle\Service\EntitySlugger;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -73,7 +75,7 @@ class EventTagBackendController extends AbstractController
 
         $form = $this->createForm(EventTagType::class, $eventTag);
 
-        $form->add('save', SubmitType::class);
+        $form->add('save', MultiSaveType::class);
 
         $form->handleRequest($request);
 
@@ -85,7 +87,7 @@ class EventTagBackendController extends AbstractController
 
                 $this->addFlash('notice', 'The event tag was created successfully.');
 
-                return $this->redirectToRoute('event_tag_index');
+                return $this->redirectForm($eventTag, $form);
             }
 
             $this->addFlash('error', 'There are some errors in the form below.');
@@ -111,7 +113,7 @@ class EventTagBackendController extends AbstractController
 
         $form = $this->createForm(EventTagType::class, $eventTag);
 
-        $form->add('save', SubmitType::class);
+        $form->add('save', MultiSaveType::class);
 
         $form->handleRequest($request);
 
@@ -123,9 +125,7 @@ class EventTagBackendController extends AbstractController
 
                 $this->addFlash('notice', 'The event tag was updated successfully.');
 
-                return $this->redirectToRoute('event_tag_index', [
-                    'id' => $eventTag->getId(),
-                ]);
+                return $this->redirectForm($eventTag, $form);
             }
 
             $this->addFlash('error', 'There are some errors in the form below.');
@@ -135,6 +135,21 @@ class EventTagBackendController extends AbstractController
             'form' => $form->createView(),
             'event_tag' => $eventTag,
         ]);
+    }
+
+    private function redirectForm(EventTag $eventTag, FormInterface $form): Response
+    {
+        $clickedButtonName = $form->getClickedButton()->getName() ?? null;
+
+        if ('keep_editing' === $clickedButtonName) {
+            return $this->redirectToRoute('event_tag_edit', [
+                'id' => $eventTag->getId(),
+            ]);
+        } elseif ('add_another' === $clickedButtonName) {
+            return $this->redirectToRoute('event_tag_create');
+        } else {
+            return $this->redirectToRoute('event_tag_index');
+        }
     }
 
     #[Route('/events/tag/{id}/delete', name: 'event_tag_delete', methods: ['GET', 'POST'])]
