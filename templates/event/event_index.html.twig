@@ -67,54 +67,7 @@
           </thead>
           <tbody>
             {% for event in pagination.results %}
-              <tr>
-                <td>
-                  {{ event }}
-                  {% if not is_past %}
-                    <br>
-                    {% if event.isPublished %}
-                      {{ bootstrap_badge_success('Published') }}
-                    {% elseif event.publishedAt %}
-                      {{ bootstrap_badge_warning('Pending') }}
-                    {% else %}
-                      {{ bootstrap_badge_secondary('Draft') }}
-                    {% endif %}
-                  {% endif %}
-                </td>
-                <td>
-                  {% for time in event.times %}
-                  <small class="d-block">{{ time }}</small>
-                  {% endfor %}
-                </td>
-                {% if event_tags_enabled %}
-                  <td>
-                    {% for tag in event.getTags %}
-                      {{ bootstrap_badge_secondary(tag.name) }} <br>
-                    {% endfor %}
-                  </td>
-                {% endif %}
-                <td>{{ event.updatedAt|datetime }}</td>
-                <td>
-                  {% if is_granted(attributes.edit, event) %}
-                  <a class="btn btn-sm btn-primary btn-action" href="{{ path('event_edit', {id: event.id}) }}" title="Edit">
-                    {{ bootstrap_icon('pencil') }}
-                    <span class="visually-hidden">Edit</span>
-                  </a>
-                  {% endif %}
-                  {% if is_granted(attributes.duplicate, event) %}
-                  <a class="btn btn-sm btn-primary btn-action" href="{{ path('event_duplicate', {id: event.id}) }}" title="Duplicate">
-                    {{ bootstrap_icon('copy') }}
-                    <span class="visually-hidden">Duplicate</span>
-                  </a>
-                  {% endif %}
-                  {% if is_granted(attributes.delete, event) %}
-                  <a class="btn btn-sm btn-danger btn-action" href="{{ path('event_delete', {id: event.id}) }}" title="Delete" data-confirm="Are you sure you want to delete this event? Clicking OK will take you to a verification step to delete this entry.">
-                    {{ bootstrap_icon('trash') }}
-                    <span class="visually-hidden">Delete</span>
-                  </a>
-                  {% endif %}
-                </td>
-              </tr>
+              {{ _self.table_row(event, attributes, is_past, event_tags_enabled) }}
             {% endfor %}
           </tbody>
         </table>
@@ -133,3 +86,72 @@
     </div>
   </div>
 {% endblock %}
+
+{% macro table_row(event, attributes, is_past, event_tags_enabled) %}
+  {% set row_actions = [] %}
+
+  {% if is_granted(attributes.edit, event) %}
+    {% set row_actions = row_actions|merge([{
+      route: 'event_edit',
+      route_params: {id: event.id},
+      color: 'secondary',
+      icon: 'pen',
+      text: 'Edit Event',
+    }]) %}
+  {% endif %}
+
+  {% if is_granted(attributes.duplicate, event) %}
+    {% set row_actions = row_actions|merge([{
+      route: 'event_duplicate',
+      route_params: {id: event.id},
+      color: 'secondary',
+      icon: 'copy',
+      text: 'Duplicate Event',
+    }]) %}
+  {% endif %}
+
+  {% if is_granted(attributes.delete, event) %}
+    {% set row_actions = row_actions|merge([{
+      route: 'event_delete',
+      route_params: {id: event.id},
+      color: 'danger',
+      icon: 'trash',
+      text: 'Delete Event',
+      confirm: 'Are you sure you want to delete this event? Clicking OK will take you to a verification step to delete this entry.',
+    }]) %}
+  {% endif %}
+
+  <tr>
+    <td>
+      {{ event }}
+      {% if not is_past %}
+        <br>
+        {% if event.isPublished %}
+          {{ bootstrap_badge_success('Published') }}
+        {% elseif event.publishedAt %}
+          {{ bootstrap_badge_warning('Pending') }}
+        {% else %}
+          {{ bootstrap_badge_secondary('Draft') }}
+        {% endif %}
+      {% endif %}
+    </td>
+    <td>
+      {% for time in event.times %}
+      <small class="d-block">{{ time }}</small>
+      {% endfor %}
+    </td>
+    {% if event_tags_enabled %}
+      <td>
+        {% for tag in event.getTags %}
+          {{ bootstrap_badge_secondary(tag.name) }} <br>
+        {% endfor %}
+      </td>
+    {% endif %}
+    <td>{{ event.updatedAt|datetime }}</td>
+    <td>
+      {% include '@OHMediaBackend/widget/row_actions.html.twig' with {
+        row_actions: row_actions,
+      } only %}
+    </td>
+  </tr>
+{% endmacro %}

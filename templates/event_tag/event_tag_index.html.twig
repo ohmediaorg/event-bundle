@@ -45,27 +45,7 @@
           </thead>
           <tbody>
             {% for result in pagination.results %}
-              {% set event_tag = result.0 %}
-
-              <tr>
-                <td>{{ event_tag }}</td>
-                <td>{{ result.event_count }}</td>
-                <td>{{ event_tag.getUpdatedAt|datetime }}</td>
-                <td>
-                  {% if is_granted(attributes.edit, event_tag) %}
-                  <a class="btn btn-sm btn-primary btn-action" href="{{ path('event_tag_edit', {id: event_tag.id}) }}" title="Edit">
-                    {{ bootstrap_icon('pencil') }}
-                    <span class="visually-hidden">Edit</span>
-                  </a>
-                  {% endif %}
-                  {% if is_granted(attributes.delete, event_tag) %}
-                  <a class="btn btn-sm btn-danger btn-action" href="{{ path('event_tag_delete', {id: event_tag.id}) }}" title="Delete" data-confirm="Are you sure you want to delete this tag? Clicking OK will take you to a verification step to delete this entry.">
-                    {{ bootstrap_icon('trash') }}
-                    <span class="visually-hidden">Delete</span>
-                  </a>
-                  {% endif %}
-                </td>
-              </tr>
+              {{ _self.table_row(result, attributes) }}
             {% endfor %}
           </tbody>
         </table>
@@ -82,3 +62,41 @@
     </div>
   </div>
 {% endblock %}
+
+{% macro table_row(result, attributes) %}
+  {% set event_tag = result.0 %}
+
+  {% set row_actions = [] %}
+
+  {% if is_granted(attributes.edit, event_tag) %}
+    {% set row_actions = row_actions|merge([{
+      route: 'event_tag_edit',
+      route_params: {id: event_tag.id},
+      color: 'secondary',
+      icon: 'pen',
+      text: 'Edit Tag',
+    }]) %}
+  {% endif %}
+
+  {% if is_granted(attributes.delete, event_tag) %}
+    {% set row_actions = row_actions|merge([{
+      route: 'event_tag_delete',
+      route_params: {id: event_tag.id},
+      color: 'danger',
+      icon: 'trash',
+      text: 'Delete Tag',
+      confirm: 'Are you sure you want to delete this tag? Clicking OK will take you to a verification step to delete this entry.',
+    }]) %}
+  {% endif %}
+
+  <tr>
+    <td>{{ event_tag }}</td>
+    <td>{{ result.event_count }}</td>
+    <td>{{ event_tag.getUpdatedAt|datetime }}</td>
+    <td>
+      {% include '@OHMediaBackend/widget/row_actions.html.twig' with {
+        row_actions: row_actions,
+      } only %}
+    </td>
+  </tr>
+{% endmacro %}
