@@ -2,6 +2,7 @@
 
 namespace OHMedia\EventBundle\Controller;
 
+use Doctrine\ORM\QueryBuilder;
 use OHMedia\BackendBundle\Form\MultiSaveType;
 use OHMedia\BackendBundle\Routing\Attribute\Admin;
 use OHMedia\BootstrapBundle\Service\Paginator;
@@ -12,14 +13,17 @@ use OHMedia\EventBundle\Form\EventType;
 use OHMedia\EventBundle\Repository\EventRepository;
 use OHMedia\EventBundle\Security\Voter\EventTagVoter;
 use OHMedia\EventBundle\Security\Voter\EventVoter;
+use OHMedia\TimezoneBundle\Util\DateTimeUtil;
 use OHMedia\UtilityBundle\Form\DeleteType;
 use OHMedia\UtilityBundle\Service\EntitySlugger;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,12 +40,12 @@ class EventBackendController extends AbstractController
     ) {
     }
 
-    #[Route('/events/{status}', name: 'event_index', methods: ['GET'], requirements: ['status' => 'upcoming|past'])]
+    #[Route('/events', name: 'event_index', methods: ['GET'])]
     public function index(
         Paginator $paginator,
+        Request $request,
         #[Autowire('%oh_media_event.event_tags%')]
         bool $eventTagsEnabled,
-        string $status = 'upcoming',
     ): Response {
         $newEvent = new Event();
         $newEventTag = new EventTag();
@@ -52,32 +56,141 @@ class EventBackendController extends AbstractController
             'You cannot access the list of events.'
         );
 
-        $isPast = 'past' === $status;
+        $qb = $this->eventRepository->createQueryBuilder('e');
 
-        if ($isPast) {
-            $currentQb = $this->eventRepository->getPastQueryBuilderOrdered();
-            $otherQb = $this->eventRepository->getUpcomingQueryBuilder();
-            $title = 'Past Events';
-        } else {
-            $currentQb = $this->eventRepository->getUpcomingQueryBuilderOrdered();
-            $otherQb = $this->eventRepository->getPastQueryBuilder();
-            $title = 'Upcoming Events';
-        }
+        $searchForm = $this->getSearchForm($request);
 
-        $otherCount = $otherQb->select('COUNT(e)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        $this->applySearch($searchForm, $qb);
 
         return $this->render('@OHMediaEvent/event/event_index.html.twig', [
-            'pagination' => $paginator->paginate($currentQb, 20),
+            'pagination' => $paginator->paginate($qb, 20),
             'new_event' => $newEvent,
             'new_event_tag' => $newEventTag,
             'attributes' => $this->getAttributes(),
-            'other_count' => $otherCount,
-            'is_past' => $isPast,
-            'title' => $title,
+            'search_form' => $searchForm,
             'event_tags_enabled' => $eventTagsEnabled,
         ]);
+    }
+
+    private function getSearchForm(Request $request): FormInterface
+    {
+        $formBuilder = $this->container->get('form.factory')
+            ->createNamedBuilder('', FormType::class, null, [
+                'csrf_protection' => false,
+            ]);
+
+        $formBuilder->setMethod('GET');
+
+        $formBuilder->add('search', TextType::class, [
+            'required' => false,
+        ]);
+
+        $formBuilder->add('status', ChoiceType::class, [
+            'required' => false,
+            'choices' => [
+                'All' => '',
+                'Published' => 'published',
+                'Scheduled' => 'scheduled',
+                'Draft' => 'draft',
+            ],
+        ]);
+
+        $formBuilder->add('type', ChoiceType::class, [
+            'required' => false,
+            'choices' => [
+                'All' => '',
+                'Upcoming' => 'upcoming',
+                'Past' => 'past',
+            ],
+            'data' => 'upcoming',
+        ]);
+
+        $formBuilder->add('order', ChoiceType::class, [
+            'choices' => [
+                'Newest to Oldest' => 'desc',
+                'Oldest to Newest' => 'asc',
+            ],
+            'data' => 'asc',
+        ]);
+
+        $form = $formBuilder->getForm();
+
+        $form->handleRequest($request);
+
+        return $form;
+    }
+
+    private function applySearch(FormInterface $form, QueryBuilder $qb): void
+    {
+        $search = $form->get('search')->getData();
+
+        if ($search) {
+            $searchFields = [
+                'e.title',
+                'e.slug',
+                'e.snippet',
+                'e.description',
+                'e.location',
+            ];
+
+            $searchLikes = [];
+            foreach ($searchFields as $searchField) {
+                $searchLikes[] = "$searchField LIKE :search";
+            }
+
+            $qb->andWhere('('.implode(' OR ', $searchLikes).')')
+                ->setParameter('search', '%'.$search.'%');
+        }
+
+        $status = $form->get('status')->getData();
+
+        if ('published' === $status) {
+            $qb->andWhere('e.published_at IS NOT NULL');
+            $qb->andWhere('e.published_at <= :now');
+            $qb->setParameter('now', DateTimeUtil::getDateTimeUtc());
+        } elseif ('scheduled' === $status) {
+            $qb->andWhere('e.published_at IS NOT NULL');
+            $qb->andWhere('e.published_at > :now');
+            $qb->setParameter('now', DateTimeUtil::getDateTimeUtc());
+        } elseif ('draft' === $status) {
+            $qb->andWhere('e.published_at IS NULL');
+        }
+
+        $type = $form->get('type')->getData();
+
+        if ('upcoming' === $type) {
+            $qb->andWhere('(
+                SELECT MAX(et.ends_at)
+                FROM OHMedia\EventBundle\Entity\EventTime et
+                WHERE IDENTITY(et.event) = e.id
+            ) > :now');
+            $qb->setParameter('now', DateTimeUtil::getDateTimeUtc());
+        } elseif ('past' === $type) {
+            $qb->andWhere('(
+                SELECT MAX(et.ends_at)
+                FROM OHMedia\EventBundle\Entity\EventTime et
+                WHERE IDENTITY(et.event) = e.id
+            ) < :now');
+            $qb->setParameter('now', DateTimeUtil::getDateTimeUtc());
+        }
+
+        $order = $form->get('order')->getData();
+
+        if ('desc' === $order) {
+            $qb->addSelect('(
+                SELECT MAX(et2.ends_at)
+                FROM OHMedia\EventBundle\Entity\EventTime et2
+                WHERE IDENTITY(et2.event) = e.id
+            ) AS HIDDEN ends_at');
+            $qb->orderBy('ends_at', 'DESC');
+        } else {
+            $qb->addSelect('(
+                SELECT MIN(et2.starts_at)
+                FROM OHMedia\EventBundle\Entity\EventTime et2
+                WHERE IDENTITY(et2.event) = e.id
+            ) AS HIDDEN starts_at');
+            $qb->orderBy('starts_at', 'ASC');
+        }
     }
 
     #[Route('/event/create', name: 'event_create', methods: ['GET', 'POST'])]

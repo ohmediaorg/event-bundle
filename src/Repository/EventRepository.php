@@ -52,18 +52,6 @@ class EventRepository extends ServiceEntityRepository implements WysiwygReposito
         ;
     }
 
-    public function getPastQueryBuilder(): QueryBuilder
-    {
-        return $this->createQueryBuilder('e')
-            ->where('(
-                SELECT MAX(et.ends_at)
-                FROM OHMedia\EventBundle\Entity\EventTime et
-                WHERE IDENTITY(et.event) = e.id
-            ) < :now')
-            ->setParameter('now', DateTimeUtil::getDateTimeUtc())
-        ;
-    }
-
     public function getUpcomingQueryBuilderOrdered(): QueryBuilder
     {
         return $this->getUpcomingQueryBuilder()
@@ -74,17 +62,6 @@ class EventRepository extends ServiceEntityRepository implements WysiwygReposito
                 AND et2.ends_at > :now
             ) AS HIDDEN starts_at')
             ->orderBy('starts_at', 'ASC');
-    }
-
-    public function getPastQueryBuilderOrdered(): QueryBuilder
-    {
-        return $this->getPastQueryBuilder()
-            ->addSelect('(
-                SELECT MAX(et2.ends_at)
-                FROM OHMedia\EventBundle\Entity\EventTime et2
-                WHERE IDENTITY(et2.event) = e.id
-            ) AS HIDDEN ends_at')
-            ->orderBy('ends_at', 'DESC');
     }
 
     public function getFrontendQueryBuilder(): QueryBuilder

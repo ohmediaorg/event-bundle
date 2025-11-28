@@ -1,10 +1,10 @@
 {% extends '@OHMediaBackend/base.html.twig' %}
 
-{% block meta_title %}{{ title }}{% endblock %}
+{% block meta_title %}Events{% endblock %}
 
 {% block breadcrumbs %}
   {{ bootstrap_breadcrumbs(
-    bootstrap_breadcrumb(bootstrap_icon('calendar-event') ~ ' ' ~ title, 'event_index'),
+    bootstrap_breadcrumb(bootstrap_icon('calendar-event') ~ ' Events', 'event_index'),
   ) }}
 {% endblock %}
 
@@ -25,19 +25,6 @@
       {{ bootstrap_icon('tags') }} Tags
     </a>
   {% endif %}
-  {% if is_past %}
-    <a href="{{ path('event_index', {status: 'upcoming'}) }}" class="btn btn-secondary">
-      {{ bootstrap_icon('hourglass-top') }}
-      Upcoming Events
-      {{ bootstrap_badge_dark(other_count) }}
-    </a>
-  {% else %}
-    <a href="{{ path('event_index', {status: 'past'}) }}" class="btn btn-secondary">
-      {{ bootstrap_icon('hourglass-bottom') }}
-      Past Events
-      {{ bootstrap_badge_dark(other_count) }}
-    </a>
-  {% endif %}
 {% endblock %}
 
 {% block main %}
@@ -46,11 +33,32 @@
   <div class="card">
     <div class="card-body">
       <div class="card-title card-title-with-count">
-        <h1 class="card-title-heading">{{ title }}</h1>
+        <h1 class="card-title-heading">Events</h1>
         <div class="card-title-count">
           {{ bootstrap_badge_primary(event_count) }}
         </div>
       </div>
+
+      {{ form_start(search_form) }}
+        <div class="row align-items-end">
+          <div class="col-lg-3 col-sm-6">
+            {{ form_row(search_form.search) }}
+          </div>
+          <div class="col-lg-3 col-sm-6">
+            {{ form_row(search_form.status) }}
+          </div>
+          <div class="col-lg-3 col-sm-6">
+            {{ form_row(search_form.type) }}
+          </div>
+          <div class="col-lg-3 col-sm-6">
+            {{ form_row(search_form.order) }}
+          </div>
+          <div class="col-lg-12 col-sm-6">
+            <button class="btn btn-primary mb-3" type="submit">Search</button>
+            <a class="btn btn-dark mb-3" href="{{ path('event_index') }}">Reset</a>
+          </div>
+        </div>
+      {{ form_end(search_form) }}
 
       {% if event_count %}
         <table class="table table-striped">
@@ -67,7 +75,7 @@
           </thead>
           <tbody>
             {% for event in pagination.results %}
-              {{ _self.table_row(event, attributes, is_past, event_tags_enabled) }}
+              {{ _self.table_row(event, attributes, event_tags_enabled) }}
             {% endfor %}
           </tbody>
         </table>
@@ -78,8 +86,8 @@
       {% else %}
         <p>
           No events found.
-          {% if not is_past and can_create_event %}
-          <a href="{{ create_event_href }}">Click here to add an event.</a>
+          {% if can_create_event %}
+            <a href="{{ create_event_href }}">Click here to add an event.</a>
           {% endif %}
         </p>
       {% endif %}
@@ -87,7 +95,7 @@
   </div>
 {% endblock %}
 
-{% macro table_row(event, attributes, is_past, event_tags_enabled) %}
+{% macro table_row(event, attributes, event_tags_enabled) %}
   {% set row_actions = [] %}
 
   {% if is_granted(attributes.edit, event) %}
@@ -124,15 +132,17 @@
   <tr>
     <td>
       {{ event }}
-      {% if not is_past %}
-        <br>
-        {% if event.isPublished %}
-          {{ bootstrap_badge_success('Published') }}
-        {% elseif event.publishedAt %}
-          {{ bootstrap_badge_warning('Pending') }}
-        {% else %}
-          {{ bootstrap_badge_secondary('Draft') }}
-        {% endif %}
+      <br>
+      {% if event.isPublished %}
+        {{ bootstrap_badge_success('Published') }}
+      {% elseif event.publishedAt %}
+        {{ bootstrap_badge_warning('Pending') }}
+      {% else %}
+        {{ bootstrap_badge_secondary('Draft') }}
+      {% endif %}
+
+      {% if event.isPast %}
+        {{ bootstrap_badge_dark('Past') }}
       {% endif %}
     </td>
     <td>
