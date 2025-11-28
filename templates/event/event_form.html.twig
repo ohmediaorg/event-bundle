@@ -3,183 +3,183 @@
 {% block meta_title %}{{ form_title }}{% endblock %}
 
 {% macro form_row_time(form) %}
-<tr id="{{ form.vars.id }}">
-  <td>
-    {{ form_widget(form.starts_at, {
-      attr: {
-        class: 'form-control-sm',
-      },
-    }) }}
-    {{ form_errors(form.starts_at) }}
-  </td>
-  <td>
-    {{ form_widget(form.ends_at, {
-      attr: {
-        class: 'form-control-sm',
-      },
-    }) }}
-    {{ form_errors(form.ends_at) }}
-  </td>
-  <td>
-    <a class="btn btn-danger btn-sm float-end" title="Delete" href="#" id="{{ form.vars.id }}_delete">
-      {{ bootstrap_icon('trash') }}
-      <span class="visually-hidden">Delete</span>
-    </a>
-  </td>
-</tr>
+  <tr id="{{ form.vars.id }}">
+    <td>
+      {{ form_widget(form.starts_at, {
+        attr: {
+          class: 'form-control-sm',
+        },
+      }) }}
+      {{ form_errors(form.starts_at) }}
+    </td>
+    <td>
+      {{ form_widget(form.ends_at, {
+        attr: {
+          class: 'form-control-sm',
+        },
+      }) }}
+      {{ form_errors(form.ends_at) }}
+    </td>
+    <td>
+      <a class="btn btn-danger btn-sm float-end" title="Delete" href="#" id="{{ form.vars.id }}_delete">
+        {{ bootstrap_icon('trash') }}
+        <span class="visually-hidden">Delete</span>
+      </a>
+    </td>
+  </tr>
 {% endmacro %}
 
 {% block main %}
-<div class="row">
-  <div class="col-xl-8">
-    <div class="card">
-      <div class="card-body">
-        <h1 class="card-title">{{ form_title }}</h1>
+  <div class="row">
+    <div class="col-xl-8">
+      <div class="card">
+        <div class="card-body">
+          <h1 class="card-title">{{ form_title }}</h1>
 
-        {{ form_start(form) }}
-          {{ form_row(form.name) }}
-          {{ form_row(form.snippet) }}
-          {{ form_row(form.description) }}
-          {{ form_row(form.location) }}
-          {{ form_row(form.ticket_url) }}
-          {{ form_row(form.image) }}
-          {% if form.tags is defined %}
-            {{ form_row(form.tags) }}
-          {% endif %}
-          {{ form_row(form.timezone) }}
+          {{ form_start(form) }}
+            {{ form_row(form.name) }}
+            {{ form_row(form.snippet) }}
+            {{ form_row(form.description) }}
+            {{ form_row(form.location) }}
+            {{ form_row(form.ticket_url) }}
+            {{ form_row(form.image) }}
+            {% if form.tags is defined %}
+              {{ form_row(form.tags) }}
+            {% endif %}
+            {{ form_row(form.timezone) }}
 
-          {% do form.times.setRendered %}
+            {% do form.times.setRendered %}
 
-          <fieldset class="mb-3">
-            {{ form_label(form.times) }}
+            <fieldset class="mb-3">
+              {{ form_label(form.times) }}
 
-            <div id="{{ form.times.vars.id }}">
-              <small class="d-block">
-                Entering time:
+              <div id="{{ form.times.vars.id }}">
+                <small class="d-block">
+                  Entering time:
 
-                <ul>
-                  <li>there must be at least 1 entry</li>
-                  <li>entries may not overlap</li>
-                  <li>the Start time must be before the End time for a single entry</li>
-                </ul>
-              </small>
+                  <ul>
+                    <li>there must be at least 1 entry</li>
+                    <li>entries may not overlap</li>
+                    <li>the Start time must be before the End time for a single entry</li>
+                  </ul>
+                </small>
 
-              <table class="table table-sm">
-                <thead>
-                  <tr>
-                    <th>Start</th>
-                    <th>End</th>
-                    <th>&nbsp;</th>
-                  </tr>
-                </thead>
-                <tbody id="times_container">
-                {% for child in form.times.children %}
-                {{ _self.form_row_time(child) }}
-                {% endfor %}
-                </tbody>
-              </table>
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Start</th>
+                      <th>End</th>
+                      <th>&nbsp;</th>
+                    </tr>
+                  </thead>
+                  <tbody id="times_container">
+                    {% for child in form.times.children %}
+                      {{ _self.form_row_time(child) }}
+                    {% endfor %}
+                  </tbody>
+                </table>
 
-              {{ form_errors(form.times) }}
+                {{ form_errors(form.times) }}
 
-              <a class="btn btn-primary btn-sm" id="add_time" href="#">
-                {{ bootstrap_icon('plus-lg') }}
-                Add Time
-              </a>
-            </div>
-          </fieldset>
-        {{ form_end(form) }}
+                <a class="btn btn-primary btn-sm" id="add_time" href="#">
+                  {{ bootstrap_icon('plus-lg') }}
+                  Add Time
+                </a>
+              </div>
+            </fieldset>
+          {{ form_end(form) }}
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}
 
 {% block javascripts %}
-<template id="time_prototype">{{ _self.form_row_time(form.times.vars.prototype) }}</template>
+  <template id="time_prototype">{{ _self.form_row_time(form.times.vars.prototype) }}</template>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const timePrototype = document.getElementById('time_prototype');
-  const timePrototypeName = {{ form.times.vars.prototype.vars.name|js }};
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const timePrototype = document.getElementById('time_prototype');
+      const timePrototypeName = {{ form.times.vars.prototype.vars.name|js }};
 
-  const addTimeButton = document.getElementById('add_time');
-  const timesContainer = document.getElementById('times_container');
+      const addTimeButton = document.getElementById('add_time');
+      const timesContainer = document.getElementById('times_container');
 
-  let timeIndex = {{ form.times.children|length - 1 }};
+      let timeIndex = {{ form.times.children|length - 1 }};
 
-  function onAddOrRemoveTime() {
-    const rows = timesContainer.querySelectorAll('tr');
+      function onAddOrRemoveTime() {
+        const rows = timesContainer.querySelectorAll('tr');
 
-    if (0 === rows.length) {
-      // make sure there is always one entry
-      addTime();
-    } else if (1 === rows.length) {
-      // if there is only one entry, hide its delete button
-      rows[0].querySelector('#' + rows[0].id + '_delete').style.visibility = 'hidden';
-    } else {
-      // make sure all delete buttons are visible
-      rows.forEach(row => {
-        row.querySelector('#' + row.id + '_delete').style.visibility = '';
-      });
-    }
-  }
+        if (0 === rows.length) {
+          // make sure there is always one entry
+          addTime();
+        } else if (1 === rows.length) {
+          // if there is only one entry, hide its delete button
+          rows[0].querySelector('#' + rows[0].id + '_delete').style.visibility = 'hidden';
+        } else {
+          // make sure all delete buttons are visible
+          rows.forEach(row => {
+            row.querySelector('#' + row.id + '_delete').style.visibility = '';
+          });
+        }
+      }
 
-  async function initRow(row) {
-    const startsAt = document.getElementById(row.id + '_starts_at');
-    const endsAt = document.getElementById(row.id + '_ends_at');
+      async function initRow(row) {
+        const startsAt = document.getElementById(row.id + '_starts_at');
+        const endsAt = document.getElementById(row.id + '_ends_at');
 
-    function onStartsAtChange() {
-      endsAt.min = startsAt.value;
-    }
+        function onStartsAtChange() {
+          endsAt.min = startsAt.value;
+        }
 
-    startsAt.addEventListener('change', onStartsAtChange);
+        startsAt.addEventListener('change', onStartsAtChange);
 
-    onStartsAtChange();
+        onStartsAtChange();
 
-    const deleteButton = document.getElementById(row.id + '_delete');
+        const deleteButton = document.getElementById(row.id + '_delete');
 
-    deleteButton.addEventListener('click', async function(e) {
-      e.preventDefault();
+        deleteButton.addEventListener('click', async function(e) {
+          e.preventDefault();
 
-      const confirmed = await customConfirm('Are you sure you want to delete this entry?');
+          const confirmed = await customConfirm('Are you sure you want to delete this entry?');
 
-      if (confirmed) {
-        row.remove();
+          if (confirmed) {
+            row.remove();
+
+            onAddOrRemoveTime();
+          }
+        });
+      }
+
+      function addTime() {
+        timeIndex++;
+
+        const row = timePrototype.content.firstElementChild.cloneNode(true);
+
+        row.innerHTML = row.innerHTML.replaceAll(timePrototypeName, timeIndex);
+
+        row.id = row.id.replace(timePrototypeName, timeIndex);
+
+        timesContainer.append(row);
+
+        initRow(row);
 
         onAddOrRemoveTime();
       }
+
+      addTimeButton.addEventListener('click', async function(e) {
+        e.preventDefault();
+
+        addTime();
+      });
+
+      const rows = timesContainer.querySelectorAll('tr');
+
+      rows.forEach(initRow);
+
+      if (!rows.length) {
+        addTime();
+      }
     });
-  }
-
-  function addTime() {
-    timeIndex++;
-
-    const row = timePrototype.content.firstElementChild.cloneNode(true);
-
-    row.innerHTML = row.innerHTML.replaceAll(timePrototypeName, timeIndex);
-
-    row.id = row.id.replace(timePrototypeName, timeIndex);
-
-    timesContainer.append(row);
-
-    initRow(row);
-
-    onAddOrRemoveTime();
-  }
-
-  addTimeButton.addEventListener('click', async function(e) {
-    e.preventDefault();
-
-    addTime();
-  });
-
-  const rows = timesContainer.querySelectorAll('tr');
-
-  rows.forEach(initRow);
-
-  if (!rows.length) {
-    addTime();
-  }
-});
-</script>
+  </script>
 {% endblock %}

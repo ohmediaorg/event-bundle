@@ -3,45 +3,45 @@
 {% block meta_title %}Duplicate | {{ existing_event }}{% endblock %}
 
 {% block breadcrumbs %}
-{{ bootstrap_breadcrumbs(
-  bootstrap_breadcrumb(bootstrap_icon('calendar-event') ~ ' Events', 'event_index'),
-  bootstrap_breadcrumb(existing_event, 'event_edit', {id: existing_event.id}),
-  bootstrap_breadcrumb('Duplicate'),
-) }}
+  {{ bootstrap_breadcrumbs(
+    bootstrap_breadcrumb(bootstrap_icon('calendar-event') ~ ' Events', 'event_index'),
+    bootstrap_breadcrumb(existing_event, 'event_edit', {id: existing_event.id}),
+    bootstrap_breadcrumb('Duplicate'),
+  ) }}
 {% endblock %}
 
 {% block main %}
-{% set amount %}
-{{ form_widget(form.amount, {
-  attr: {
-    class: 'd-inline-block form-control-sm',
-    style: 'width: 3.5rem',
-  },
-}) }}
-{% endset %}
+  {% set amount %}
+    {{ form_widget(form.amount, {
+      attr: {
+        class: 'd-inline-block form-control-sm',
+        style: 'width: 3.5rem',
+      },
+    }) }}
+  {% endset %}
 
-{% set unit %}
-{{ form_widget(form.unit, {
-  attr: {
-    class: 'd-inline-block form-select-sm',
-    style: 'width: auto',
-  },
-}) }}
-{% endset %}
+  {% set unit %}
+    {{ form_widget(form.unit, {
+      attr: {
+        class: 'd-inline-block form-select-sm',
+        style: 'width: auto',
+      },
+    }) }}
+  {% endset %}
 
-<div class="row">
-  <div class="col-xl-8">
-    <div class="card">
-      <div class="card-body">
-        <h1 class="card-title">Duplicate {{ existing_event }}</h1>
+  <div class="row">
+    <div class="col-xl-8">
+      <div class="card">
+        <div class="card-body">
+          <h1 class="card-title">Duplicate {{ existing_event }}</h1>
 
-        {{ form_start(form) }}
-        <p>
-        Duplicate this event for {{ amount|raw }} {{ unit|raw }} in the future.
-        </p>
-        {{ form_end(form) }}
+          {{ form_start(form) }}
+          <p>
+            Duplicate this event for {{ amount|raw }} {{ unit|raw }} in the future.
+          </p>
+          {{ form_end(form) }}
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}
