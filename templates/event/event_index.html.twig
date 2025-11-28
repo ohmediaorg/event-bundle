@@ -4,7 +4,7 @@
 
 {% block breadcrumbs %}
 {{ bootstrap_breadcrumbs(
-  bootstrap_breadcrumb(bootstrap_icon('calendar3') ~ ' ' ~ title, 'event_index'),
+  bootstrap_breadcrumb(bootstrap_icon('calendar-event') ~ ' ' ~ title, 'event_index'),
 ) }}
 {% endblock %}
 
@@ -23,7 +23,7 @@
   {% endif %}
   {% if can_view_event_tag %}
     <a href="{{ view_event_tags_href }}" class="btn btn-primary">
-      {{ bootstrap_icon('tag') }} Tags
+      {{ bootstrap_icon('tags') }} Tags
     </a>
   {% endif %}
   {% if is_past %}
