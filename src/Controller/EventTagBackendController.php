@@ -4,7 +4,6 @@ namespace OHMedia\EventBundle\Controller;
 
 use OHMedia\BackendBundle\Form\MultiSaveType;
 use OHMedia\BackendBundle\Routing\Attribute\Admin;
-use OHMedia\BootstrapBundle\Service\Paginator;
 use OHMedia\EventBundle\Entity\Event;
 use OHMedia\EventBundle\Entity\EventTag;
 use OHMedia\EventBundle\Form\EventTagType;
@@ -29,10 +28,8 @@ class EventTagBackendController extends AbstractController
     }
 
     #[Route('/events/tags', name: 'event_tag_index', methods: ['GET'])]
-    public function index(
-        EventTagRepository $eventTagRepository,
-        Paginator $paginator
-    ): Response {
+    public function index(EventTagRepository $eventTagRepository): Response
+    {
         $newEventTag = new EventTag();
 
         $this->denyAccessUnlessGranted(
@@ -54,7 +51,7 @@ class EventTagBackendController extends AbstractController
         $qb->orderBy('at.id', 'desc');
 
         return $this->render('@OHMediaEvent/event_tag/event_tag_index.html.twig', [
-            'pagination' => $paginator->paginate($qb, 20),
+            'results' => $qb->getQuery()->getResult(),
             'new_event_tag' => $newEventTag,
             'attributes' => $this->getAttributes(),
         ]);

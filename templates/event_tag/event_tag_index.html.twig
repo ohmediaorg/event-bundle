@@ -22,7 +22,7 @@
 {% endblock %}
 
 {% block main %}
-  {% set event_tag_count = pagination.count %}
+  {% set event_tag_count = results|length %}
 
   <div class="card">
     <div class="card-body">
@@ -44,15 +44,11 @@
             </tr>
           </thead>
           <tbody>
-            {% for result in pagination.results %}
+            {% for result in results %}
               {{ _self.table_row(result, attributes) }}
             {% endfor %}
           </tbody>
         </table>
-
-        {{ bootstrap_pagination(pagination) }}
-
-        <small>{{ bootstrap_pagination_info(pagination) }}</small>
       {% else %}
         <p>No tags found.</p>
         {% if can_create_event_tag %}
