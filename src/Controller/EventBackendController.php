@@ -22,8 +22,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\SearchType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -81,8 +81,9 @@ class EventBackendController extends AbstractController
 
         $formBuilder->setMethod('GET');
 
-        $formBuilder->add('search', TextType::class, [
+        $formBuilder->add('search', SearchType::class, [
             'required' => false,
+            'label' => 'Title, snippet, description, location',
         ]);
 
         $formBuilder->add('status', ChoiceType::class, [
