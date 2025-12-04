@@ -21,10 +21,12 @@
       {{ form_errors(form.ends_at) }}
     </td>
     <td>
-      <a class="btn btn-danger btn-sm float-end" title="Delete" href="#" id="{{ form.vars.id }}_delete">
-        {{ bootstrap_icon('trash') }}
-        <span class="visually-hidden">Delete</span>
-      </a>
+      <div class="row-actions">
+        <a class="btn btn-danger" title="Delete Time" href="#" id="{{ form.vars.id }}_delete">
+          {{ bootstrap_icon('trash') }}
+          <span class="visually-hidden">Delete Time</span>
+        </a>
+      </div>
     </td>
   </tr>
 {% endmacro %}
