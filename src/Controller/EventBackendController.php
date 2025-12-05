@@ -83,7 +83,7 @@ class EventBackendController extends AbstractController
 
         $formBuilder->add('search', SearchType::class, [
             'required' => false,
-            'label' => 'Title, snippet, description, location',
+            'label' => 'Name, snippet, description, location',
         ]);
 
         $formBuilder->add('status', ChoiceType::class, [
@@ -127,7 +127,7 @@ class EventBackendController extends AbstractController
 
         if ($search) {
             $searchFields = [
-                'e.title',
+                'e.name',
                 'e.slug',
                 'e.snippet',
                 'e.description',
