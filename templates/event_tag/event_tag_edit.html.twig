@@ -3,9 +3,9 @@
 {% set form_title = 'Edit Tag' %}
 
 {% block breadcrumbs %}
-{{ bootstrap_breadcrumbs(
-  bootstrap_breadcrumb(bootstrap_icon('calendar3') ~ ' Events', 'event_index'),
-  bootstrap_breadcrumb('Tags', 'event_tag_index'),
-  bootstrap_breadcrumb('Edit'),
-) }}
+  {{ bootstrap_breadcrumbs(
+    bootstrap_breadcrumb(bootstrap_icon('calendar-event') ~ ' Events', 'event_index'),
+    bootstrap_breadcrumb('Tags', 'event_tag_index'),
+    bootstrap_breadcrumb('Edit'),
+  ) }}
 {% endblock %}

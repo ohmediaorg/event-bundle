@@ -4,6 +4,7 @@ namespace OHMedia\EventBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use OHMedia\EventBundle\Repository\EventTimeRepository;
+use OHMedia\TimezoneBundle\Util\DateTimeUtil;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventTimeRepository::class)]
@@ -102,5 +103,10 @@ class EventTime
         $this->event = $event;
 
         return $this;
+    }
+
+    public function isPast(): bool
+    {
+        return DateTimeUtil::isPast($this->ends_at);
     }
 }

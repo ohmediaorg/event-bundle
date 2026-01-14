@@ -28,7 +28,7 @@ class EventNavItemProvider extends AbstractNavItemProvider
         if (!$this->eventTagsEnabled) {
             if ($this->isGranted(EventVoter::INDEX, new Event())) {
                 $events = new NavLink('Events', 'event_index');
-                $events->setIcon('calendar3');
+                $events->setIcon('calendar-event');
 
                 return $events;
             } else {
@@ -37,18 +37,18 @@ class EventNavItemProvider extends AbstractNavItemProvider
         }
 
         $nav = (new NavDropdown('Events'))
-            ->setIcon('calendar3');
+            ->setIcon('calendar-event');
 
         if ($this->isGranted(EventVoter::INDEX, new Event())) {
             $events = new NavLink('Events', 'event_index');
-            $events->setIcon('calendar3');
+            $events->setIcon('calendar-event');
 
             $nav->addLink($events);
         }
 
         if ($this->isGranted(EventTagVoter::INDEX, new EventTag())) {
             $tags = new NavLink('Tags', 'event_tag_index');
-            $tags->setIcon('tag');
+            $tags->setIcon('tags');
 
             $nav->addLink($tags);
         }

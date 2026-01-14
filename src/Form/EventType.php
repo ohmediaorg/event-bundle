@@ -82,6 +82,7 @@ class EventType extends AbstractType
                 'timezone' => $event->getTimezone(),
             ],
             'by_reference' => false,
+            'error_bubbling' => false,
         ]);
 
         $builder->add('published_at', DateTimeType::class, [

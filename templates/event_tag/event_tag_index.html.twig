@@ -3,10 +3,10 @@
 {% block meta_title %}Tags{% endblock %}
 
 {% block breadcrumbs %}
-{{ bootstrap_breadcrumbs(
-  bootstrap_breadcrumb(bootstrap_icon('calendar3') ~ ' Events', 'event_index'),
-  bootstrap_breadcrumb('Tags', 'event_tag_index'),
-) }}
+  {{ bootstrap_breadcrumbs(
+    bootstrap_breadcrumb(bootstrap_icon('calendar-event') ~ ' Events', 'event_index'),
+    bootstrap_breadcrumb('Tags', 'event_tag_index'),
+  ) }}
 {% endblock %}
 
 {% set can_create_event_tag = is_granted(attributes.create, new_event_tag) %}
@@ -14,73 +14,85 @@
 {% set create_event_tag_href = path('event_tag_create') %}
 
 {% block actions %}
-<div class="btn-group btn-group-sm">
   {% if can_create_event_tag %}
     <a href="{{ create_event_tag_href }}" class="btn btn-primary">
-      {{ bootstrap_icon('plus') }} Add Tag
+      {{ bootstrap_icon('plus-lg') }} Add Tag
     </a>
   {% endif %}
-</div>
 {% endblock %}
 
 {% block main %}
-{% set event_tag_count = pagination.count %}
+  {% set event_tag_count = results|length %}
 
-<div class="card">
-  <div class="card-body">
-    <div class="card-title card-title-with-count">
-      <h1 class="card-title-heading">Tags</h1>
-      <div class="card-title-count">
-        {{ bootstrap_badge_primary(event_tag_count) }}
+  <div class="card">
+    <div class="card-body">
+      <div class="card-title card-title-with-count">
+        <h1 class="card-title-heading">Tags</h1>
+        <div class="card-title-count">
+          {{ bootstrap_badge_primary(event_tag_count) }}
+        </div>
       </div>
-    </div>
 
-    {% if event_tag_count %}
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th># of Events</th>
-            <th>Last Updated</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for result in pagination.results %}
-            {% set event_tag = result.0 %}
-
-          <tr>
-            <td>{{ event_tag }}</td>
-            <td>{{ result.event_count }}</td>
-            <td>{{ event_tag.getUpdatedAt|datetime }}</td>
-            <td>
-              {% if is_granted(attributes.edit, event_tag) %}
-              <a class="btn btn-sm btn-primary btn-action" href="{{ path('event_tag_edit', {id: event_tag.id}) }}" title="Edit">
-                {{ bootstrap_icon('pen-fill') }}
-                <span class="visually-hidden">Edit</span>
-              </a>
-              {% endif %}
-              {% if is_granted(attributes.delete, event_tag) %}
-              <a class="btn btn-sm btn-danger btn-action" href="{{ path('event_tag_delete', {id: event_tag.id}) }}" title="Delete" data-confirm="Are you sure you want to delete this tag? Clicking OK will take you to a verification step to delete this entry.">
-                {{ bootstrap_icon('trash-fill') }}
-                <span class="visually-hidden">Delete</span>
-              </a>
-              {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
-      {{ bootstrap_pagination(pagination) }}
-
-      <small>{{ bootstrap_pagination_info(pagination) }}</small>
-    {% else %}
-      <p>No tags found.</p>
-      {% if can_create_event_tag %}
-        <a href="{{ create_event_tag_href }}">Click here to add a tag.</a>
+      {% if event_tag_count %}
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th># of Events</th>
+              <th>Last Updated</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for result in results %}
+              {{ _self.table_row(result, attributes) }}
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No tags found.</p>
+        {% if can_create_event_tag %}
+          <a href="{{ create_event_tag_href }}">Click here to add a tag.</a>
+        {% endif %}
       {% endif %}
-    {% endif %}
+    </div>
   </div>
-</div>
 {% endblock %}
+
+{% macro table_row(result, attributes) %}
+  {% set event_tag = result.0 %}
+
+  {% set row_actions = [] %}
+
+  {% if is_granted(attributes.edit, event_tag) %}
+    {% set row_actions = row_actions|merge([{
+      route: 'event_tag_edit',
+      route_params: {id: event_tag.id},
+      color: 'secondary',
+      icon: 'pencil',
+      text: 'Edit Tag',
+    }]) %}
+  {% endif %}
+
+  {% if is_granted(attributes.delete, event_tag) %}
+    {% set row_actions = row_actions|merge([{
+      route: 'event_tag_delete',
+      route_params: {id: event_tag.id},
+      color: 'danger',
+      icon: 'trash',
+      text: 'Delete Tag',
+      confirm: 'Are you sure you want to delete this tag? Clicking OK will take you to a verification step to delete this entry.',
+    }]) %}
+  {% endif %}
+
+  <tr>
+    <td>{{ event_tag }}</td>
+    <td>{{ result.event_count }}</td>
+    <td>{{ event_tag.getUpdatedAt|datetime }}</td>
+    <td>
+      {% include '@OHMediaBackend/widget/row_actions.html.twig' with {
+        row_actions: row_actions,
+      } only %}
+    </td>
+  </tr>
+{% endmacro %}

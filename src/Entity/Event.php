@@ -64,6 +64,7 @@ class Event implements SluggableEntityInterface
     #[ORM\OneToMany(targetEntity: EventTime::class, mappedBy: 'event', orphanRemoval: true, cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['starts_at' => 'ASC'])]
     #[Assert\Valid]
+    #[Assert\Count(min: 1, minMessage: 'You must have at least one time.')]
     private Collection $times;
 
     #[ORM\Column(nullable: true)]
@@ -222,6 +223,11 @@ class Event implements SluggableEntityInterface
         }
 
         return $this;
+    }
+
+    public function isPast(): bool
+    {
+        return $this->times->count() && $this->times->last()->isPast();
     }
 
     public function getPublishedAt(): ?\DateTimeImmutable
