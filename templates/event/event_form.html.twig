@@ -8,6 +8,7 @@
       {{ form_widget(form.starts_at, {
         attr: {
           class: 'form-control-sm',
+          'aria-label': 'Start Date/Time',
         },
       }) }}
       {{ form_errors(form.starts_at) }}
@@ -16,15 +17,15 @@
       {{ form_widget(form.ends_at, {
         attr: {
           class: 'form-control-sm',
+          'aria-label': 'Start Date/Time',
         },
       }) }}
       {{ form_errors(form.ends_at) }}
     </td>
     <td>
       <div class="row-actions">
-        <a class="btn btn-danger" title="Delete Time" href="#" id="{{ form.vars.id }}_delete">
+        <a class="btn btn-danger" title="Delete Time" href="#" id="{{ form.vars.id }}_delete" aria-label="Delete Time">
           {{ bootstrap_icon('trash') }}
-          <span class="visually-hidden">Delete Time</span>
         </a>
       </div>
     </td>
@@ -71,7 +72,7 @@
                     <tr>
                       <th>Start</th>
                       <th>End</th>
-                      <th>&nbsp;</th>
+                      <th aria-label="Row Actions"></th>
                     </tr>
                   </thead>
                   <tbody id="times_container">
