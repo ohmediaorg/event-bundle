@@ -74,6 +74,7 @@ class Event implements SluggableEntityInterface
      * @var Collection<int, EventTag>
      */
     #[ORM\ManyToMany(targetEntity: EventTag::class, inversedBy: 'events')]
+    #[ORM\OrderBy(['name' => 'ASC'])]
     private Collection $tags;
 
     public function __construct()

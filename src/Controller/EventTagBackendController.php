@@ -48,7 +48,7 @@ class EventTagBackendController extends AbstractController
             ) AS event_count')
         ;
 
-        $qb->orderBy('at.id', 'desc');
+        $qb->orderBy('at.name', 'asc');
 
         return $this->render('@OHMediaEvent/event_tag/event_tag_index.html.twig', [
             'results' => $qb->getQuery()->getResult(),

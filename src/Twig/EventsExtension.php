@@ -159,6 +159,7 @@ class EventsExtension extends AbstractExtension
             ->where('e.published_at IS NOT NULL')
             ->andWhere('e.published_at <= :now')
             ->setParameter('now', DateTimeUtil::getDateTimeUtc())
+            ->orderBy('et.name')
             ->getQuery()
             ->getResult();
 
