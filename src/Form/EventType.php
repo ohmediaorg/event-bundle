@@ -50,6 +50,7 @@ class EventType extends AbstractType
         $builder->add('ticket_url', UrlType::class, [
             'required' => false,
             'label' => 'Tickets URL',
+            'default_protocol' => null,
         ]);
 
         $builder->add('image', FileEntityType::class, [
