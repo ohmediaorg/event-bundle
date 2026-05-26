@@ -226,6 +226,20 @@ class Event implements SluggableEntityInterface
         return $this;
     }
 
+    public function getTimesUpcoming(): Collection
+    {
+        return $this->times->filter(function (EventTime $time) {
+            return $time->isUpcoming();
+        });
+    }
+
+    public function getTimesNotPast(): Collection
+    {
+        return $this->times->filter(function (EventTime $time) {
+            return !$time->isPast();
+        });
+    }
+
     public function isPast(): bool
     {
         return $this->times->count() && $this->times->last()->isPast();

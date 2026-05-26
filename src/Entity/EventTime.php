@@ -105,6 +105,11 @@ class EventTime
         return $this;
     }
 
+    public function isUpcoming(): bool
+    {
+        return DateTimeUtil::isFuture($this->starts_at);
+    }
+
     public function isPast(): bool
     {
         return DateTimeUtil::isPast($this->ends_at);
