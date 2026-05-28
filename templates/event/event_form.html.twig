@@ -7,7 +7,7 @@
     <td>
       {{ form_widget(form.starts_at, {
         attr: {
-          class: 'form-control-sm',
+          class: 'form-control-sm event-time-starts-at',
           'aria-label': 'Start Date/Time',
         },
       }) }}
@@ -16,7 +16,7 @@
     <td>
       {{ form_widget(form.ends_at, {
         attr: {
-          class: 'form-control-sm',
+          class: 'form-control-sm event-time-ends-at',
           'aria-label': 'End Date/Time',
         },
       }) }}
@@ -154,6 +154,27 @@
         });
       }
 
+      function addOneDayToDateTime(input) {
+        const date = new Date(input.value);
+
+        date.setDate(date.getDate() + 1);
+
+        const dateParts = [
+          date.getFullYear(),
+          ('0' + (date.getMonth() + 1)).slice(-2),
+          ('0' + date.getDate()).slice(-2),
+        ];
+
+        const timeParts = [
+          ('0' + date.getHours()).slice(-2),
+          ('0' + date.getMinutes()).slice(-2),
+        ];
+
+        console.log(dateParts, timeParts);
+
+        input.value = dateParts.join('-') + 'T' + timeParts.join(':');
+      }
+
       function addTime() {
         timeIndex++;
 
@@ -164,6 +185,23 @@
         row.id = row.id.replace(timePrototypeName, timeIndex);
 
         timesContainer.append(row);
+
+        if (row.previousElementSibling) {
+          const startsAt = row.querySelector('.event-time-starts-at');
+          const endsAt = row.querySelector('.event-time-ends-at');
+
+          startsAt.value = row.previousElementSibling
+            .querySelector('.event-time-starts-at')
+            .value;
+
+          endsAt.value = row.previousElementSibling
+            .querySelector('.event-time-ends-at')
+            .value;
+
+          addOneDayToDateTime(startsAt);
+
+          addOneDayToDateTime(endsAt);
+        }
 
         initRow(row);
 
