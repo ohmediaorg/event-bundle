@@ -129,6 +129,16 @@
     }]) %}
   {% endif %}
 
+  {% set upcoming_event_times = event.getTimesUpcoming %}
+
+  {% set upcoming_event_times_count = upcoming_event_times|length %}
+
+  {% set max_event_times_shown = 5 %}
+
+  {% set event_times_shown = upcoming_event_times|slice(0, max_event_times_shown) %}
+
+  {% set past_events_count = event.times|length - upcoming_event_times_count %}
+
   <tr>
     <td>
       {{ event }}
@@ -146,9 +156,19 @@
       {% endif %}
     </td>
     <td>
-      {% for time in event.times %}
-      <small class="d-block">{{ time }}</small>
+      {% if past_events_count > 0 %}
+        <small class="d-block text-muted">
+          {{ past_events_count }} in the past
+        </small>
+      {% endif %}
+      {% for time in event_times_shown %}
+        <small class="d-block">{{ time }}</small>
       {% endfor %}
+      {% if event.times|length > max_event_times_shown %}
+        <small class="d-block text-muted">
+          {{ event.times|length - max_event_times_shown }} more upcoming
+        </small>
+      {% endif %}
     </td>
     {% if event_tags_enabled %}
       <td>
