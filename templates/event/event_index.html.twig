@@ -146,7 +146,11 @@
       {% if event.isPublished %}
         {{ bootstrap_badge_success('Published') }}
       {% elseif event.publishedAt %}
-        {{ bootstrap_badge_warning('Pending') }}
+        <span
+          class="badge text-bg-warning"
+          data-bs-toggle="tooltip"
+          title="{{ event.publishedAt|date('M j, Y g:ia') }}"
+        >Scheduled</span>
       {% else %}
         {{ bootstrap_badge_secondary('Draft') }}
       {% endif %}
