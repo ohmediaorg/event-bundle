@@ -60,7 +60,7 @@ class EventsExtension extends AbstractExtension
 
         $isTemplate = $pageRevision->isTemplate($this->pageTemplate);
 
-        if (!$isTemplate && !$pageRevision->containsShortcode('events()')) {
+        if (!$isTemplate) {
             return;
         }
 
@@ -140,7 +140,7 @@ class EventsExtension extends AbstractExtension
     private function getTagsArray(
         array $query,
         array $activeTags,
-        string $pagePath
+        string $pagePath,
     ): array {
         if (!$this->eventTagsEnabled) {
             return [];
