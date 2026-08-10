@@ -68,7 +68,10 @@ class EventsExtension extends AbstractExtension
 
         $dynamicPart = $this->pageRenderer->getDynamicPart();
 
-        $qb = $this->eventRepository->getFrontendQueryBuilder();
+        $qb = $this->eventRepository->createQueryBuilder('e');
+        $qb->andWhere('e.published_at IS NOT NULL');
+        $qb->andWhere('e.published_at < :now');
+        $qb->setParameter('now', DateTimeUtil::getDateTimeUtc());
         $qb->andWhere('e.slug = :slug');
         $qb->setParameter('slug', $dynamicPart);
         $qb->setMaxResults(1);
