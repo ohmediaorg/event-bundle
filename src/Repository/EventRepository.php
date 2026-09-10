@@ -61,7 +61,7 @@ class EventRepository extends ServiceEntityRepository implements WysiwygReposito
                 WHERE IDENTITY(et2.event) = e.id
                 AND et2.ends_at > :now
             ) AS HIDDEN starts_at')
-            ->orderBy('starts_at', 'ASC');
+            ->orderBy('starts_at', \SortDirection::Ascending);
     }
 
     public function getFrontendQueryBuilder(): QueryBuilder

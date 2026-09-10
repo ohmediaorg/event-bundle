@@ -64,7 +64,7 @@ class EventType extends AbstractType
                 'class' => EventTag::class,
                 'query_builder' => function (EntityRepository $er): QueryBuilder {
                     return $er->createQueryBuilder('t')
-                        ->orderBy('t.name', 'ASC');
+                        ->orderBy('t.name', \SortDirection::Ascending);
                 },
                 'multiple' => true,
                 'expanded' => true,

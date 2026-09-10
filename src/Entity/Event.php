@@ -62,7 +62,7 @@ class Event implements SluggableEntityInterface
      * @var Collection<int, EventTime>
      */
     #[ORM\OneToMany(targetEntity: EventTime::class, mappedBy: 'event', orphanRemoval: true, cascade: ['persist', 'remove'])]
-    #[ORM\OrderBy(['starts_at' => 'ASC'])]
+    #[ORM\OrderBy(['starts_at' => \SortDirection::Ascending])]
     #[Assert\Valid]
     #[Assert\Count(min: 1, minMessage: 'You must have at least one time.')]
     private Collection $times;
@@ -74,7 +74,7 @@ class Event implements SluggableEntityInterface
      * @var Collection<int, EventTag>
      */
     #[ORM\ManyToMany(targetEntity: EventTag::class, inversedBy: 'events')]
-    #[ORM\OrderBy(['name' => 'ASC'])]
+    #[ORM\OrderBy(['name' => \SortDirection::Ascending])]
     private Collection $tags;
 
     public function __construct()

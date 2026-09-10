@@ -183,14 +183,14 @@ class EventBackendController extends AbstractController
                 FROM OHMedia\EventBundle\Entity\EventTime et2
                 WHERE IDENTITY(et2.event) = e.id
             ) AS HIDDEN ends_at');
-            $qb->orderBy('ends_at', 'DESC');
+            $qb->orderBy('ends_at', \SortDirection::Descending);
         } else {
             $qb->addSelect('(
                 SELECT MIN(et2.starts_at)
                 FROM OHMedia\EventBundle\Entity\EventTime et2
                 WHERE IDENTITY(et2.event) = e.id
             ) AS HIDDEN starts_at');
-            $qb->orderBy('starts_at', 'ASC');
+            $qb->orderBy('starts_at', \SortDirection::Ascending);
         }
     }
 
@@ -282,9 +282,9 @@ class EventBackendController extends AbstractController
             ]);
         } elseif ('add_another' === $clickedButtonName) {
             return $this->redirectToRoute('event_create');
-        } else {
-            return $this->redirectToRoute('event_index');
         }
+
+        return $this->redirectToRoute('event_index');
     }
 
     #[Route('/event/{id}/duplicate', name: 'event_duplicate', methods: ['GET', 'POST'])]
@@ -393,7 +393,7 @@ class EventBackendController extends AbstractController
     private function setTimezone(
         Event $event,
         FormInterface $form,
-        Request $request
+        Request $request,
     ): void {
         $times = $form->get('times')->getData();
         $requestData = $request->request->all($form->getName());
@@ -415,7 +415,7 @@ class EventBackendController extends AbstractController
     private function save(
         Event $event,
         FormInterface $form,
-        Request $request
+        Request $request,
     ): void {
         $this->setTimezone($event, $form, $request);
 
