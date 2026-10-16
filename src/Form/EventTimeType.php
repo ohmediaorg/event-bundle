@@ -14,6 +14,9 @@ class EventTimeType extends AbstractType
     {
         $dateTimeOptions = [
             'widget' => 'single_text',
+            'attr' => [
+                'data-bypass' => '',
+            ],
         ];
 
         if ($options['timezone']) {
